@@ -6,17 +6,13 @@
       "type": "rust"
     },
     "icpos_frontend": {
-      "dependencies": [
-        "icpos_backend"
-      ],
+      "dependencies": ["icpos_backend"],
       "frontend": {
-        "entrypoint": "src/icpos_frontend/src/index.html"
+        "entrypoint": "dist/index.html"
       },
-      "source": [
-        "src/icpos_frontend/assets",
-        "dist/icpos_frontend/"
-      ],
-      "type": "assets"
+      "source": ["dist"],
+      "type": "assets",
+      "build": ["yarn run build"]
     }
   },
   "defaults": {

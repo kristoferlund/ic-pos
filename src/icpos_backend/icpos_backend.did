@@ -1,3 +1,4 @@
 service : {
     "greet": (text) -> (text) query;
+    "get_icp_usd_exchange": () -> (text);
 }
