@@ -7,17 +7,15 @@ import {
 } from "@tanstack/router";
 
 import ConfigPage from "./pages/config";
+import HistoryPage from "./pages/history";
 import InitialConfigPage from "./pages/initial-config";
 import MerchantPage from "./pages/merchant";
 import ReceivePage from "./pages/receive";
 import SendPage from "./pages/send";
 import StartPage from "./pages/start";
 import { Toaster } from "react-hot-toast";
-
-// Create a root route
-const rootRoute = new RootRoute({
-  component: Root,
-});
+import TransactionPage from "./pages/transaction";
+import { lazy } from "@tanstack/router";
 
 function Root() {
   return (
@@ -28,37 +26,55 @@ function Root() {
   );
 }
 
+const rootRoute = new RootRoute({
+  component: Root,
+});
+
+const historyRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/history",
+  component: lazy(() => import("./pages/history")),
+});
+
+const transactionRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/transaction/$transactionId",
+  component: lazy(() => import("./pages/transaction")),
+});
+
 const routes = [
   new Route({
     getParentRoute: () => rootRoute,
     path: "/",
-    component: StartPage,
+    component: lazy(() => import("./pages/start")),
   }),
   new Route({
     getParentRoute: () => rootRoute,
     path: "/merchant",
-    component: MerchantPage,
+    component: lazy(() => import("./pages/merchant")),
   }),
   new Route({
     getParentRoute: () => rootRoute,
     path: "/initial-config",
-    component: InitialConfigPage,
+    component: lazy(() => import("./pages/initial-config")),
   }),
   new Route({
     getParentRoute: () => rootRoute,
     path: "/config",
-    component: ConfigPage,
+    component: lazy(() => import("./pages/config")),
   }),
   new Route({
     getParentRoute: () => rootRoute,
     path: "/receive",
-    component: ReceivePage,
+    component: lazy(() => import("./pages/receive")),
   }),
   new Route({
     getParentRoute: () => rootRoute,
     path: "/send",
-    component: SendPage,
+    component: lazy(() => import("./pages/send")),
   }),
+  historyRoute,
+  transactionRoute,
 ];
 
 // Create the route tree using your routes

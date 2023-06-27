@@ -97,12 +97,14 @@ export const makeApiClient = (
   return apiClient;
 };
 
-export const ApiGet = selectorFamily<AxiosResponse<unknown>, RequestParams>({
+export const ApiGet = selectorFamily({
   key: "ApiGet",
-  get: (params: RequestParams) => async (): Promise<AxiosResponse<any>> => {
-    const { config, url, handleErrorsAutomatically = true } = params;
-    const apiClient = makeApiClient(handleErrorsAutomatically);
-    const response = await apiClient.get(url, config);
-    return response;
-  },
+  get:
+    <T>(params: RequestParams) =>
+    async (): Promise<AxiosResponse<T>> => {
+      const { config, url, handleErrorsAutomatically = true } = params;
+      const apiClient = makeApiClient(handleErrorsAutomatically);
+      const response = await apiClient.get<T>(url, config);
+      return response;
+    },
 });
