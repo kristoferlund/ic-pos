@@ -4,27 +4,19 @@ import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
 import Page from "../../components/Page";
 import { SingleTransaction } from "../../icrc/transaction";
-import TransactionRow from "./components/TransactionRow";
-import { Transactions } from "../../icrc/transactions";
 import { X } from "lucide-react";
-import { shortenPrincipal } from "../../utils/shorten-principal";
-import { useAuth } from "../../auth/hooks/useAuth";
-import { useBackend } from "../../hooks/useBackend";
 import { useRecoilValue } from "recoil";
+import Main from "../../components/Main";
 
 type TransactionPageParams = {
   transactionId: string;
 };
 
 export default function TransactionPage() {
-  const params = useParams();
-  const transactionId = (params as any).transactionId;
+  const params: TransactionPageParams = useParams();
+  const transactionId = params.transactionId;
 
-  // const { merchantState } = useBackend();
-
-  const { identity } = useAuth();
   // const principal = identity?.getPrincipal().toString();
-
   const principal =
     "237zc-vao7e-qxrtp-dampy-4rqvq-3eg3b-elvly-q2xnl-jqlpj-d2jpt-xqe";
 
@@ -38,17 +30,17 @@ export default function TransactionPage() {
   if (!transaction) return null;
 
   return (
-    <>
+    <Page>
       <Header>
         <Link to="/history">
           <Button variant="ghost" size="icon">
             <X className="w-4 h-4" />
           </Button>
         </Link>
-        History
+        Transaction Details
         <div className="w-4 h-4" />
       </Header>
-      <Page>
+      <Main>
         <div className="flex flex-col items-start justify-center w-full space-y-5">
           <div>
             <div className="text-[0.8rem]">Transaction Index</div>
@@ -57,7 +49,7 @@ export default function TransactionPage() {
 
           <div>
             <div className="text-[0.8rem]">From</div>
-            <div>{transaction.from_accounts}</div>
+            <div>{transaction.from_account}</div>
           </div>
 
           <div>
@@ -70,7 +62,7 @@ export default function TransactionPage() {
             <div>{transaction.amount}</div>
           </div>
         </div>
-      </Page>
-    </>
+      </Main>
+    </Page>
   );
 }

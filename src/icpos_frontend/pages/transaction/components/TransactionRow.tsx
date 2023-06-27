@@ -1,5 +1,5 @@
 import { Transaction } from "../../../icrc/transactions";
-import { shortenPrincipal } from "../../../utils/shorten-principal";
+import { shortenPrincipal } from "../../../utils/shortenPrincipal";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
 export default function TransactionRow({

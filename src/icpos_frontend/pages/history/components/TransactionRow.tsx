@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/router";
-import { Transaction } from "../../../icrc/transactions";
-import { shortenPrincipal } from "../../../utils/shorten-principal";
+import { shortenPrincipal } from "../../../utils/shortenPrincipal";
 import { useAuth } from "../../../auth/hooks/useAuth";
+import { Transaction } from "../../../icrc/types/Transaction";
 
 export default function TransactionRow({
   transaction,
