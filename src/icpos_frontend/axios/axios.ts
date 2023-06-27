@@ -36,12 +36,12 @@ export type RequestParams = {
   handleErrorsAutomatically?: boolean;
 };
 
-type RequestDataParam = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  file?: any;
-};
+// type RequestDataParam = {
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   data: any;
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   file?: any;
+// };
 
 /**
  * Handle error responses (excluding initial 401 response). Any HTTP Code which is not 2xx will be considered as error

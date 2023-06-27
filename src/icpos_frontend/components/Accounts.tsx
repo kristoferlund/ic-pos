@@ -1,4 +1,4 @@
-import { AllAccounts } from "./api/accounts";
+import { AllAccounts } from "../icrc/accounts";
 import { useRecoilValue } from "recoil";
 
 export default function Accounts() {

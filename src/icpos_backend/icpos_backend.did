@@ -1,4 +1,23 @@
+type Principal = blob;
+
+type Merchant = record {
+  name : text;
+  email_notifications : bool;
+  email_address : text;
+  phone_notifications : bool;
+  phone_number : text;
+};
+
+type Response = record {
+  status : nat16;
+  status_text : text;
+  data : opt Merchant;
+  error_text : opt text;
+};
+
 service : {
-    "greet": (text) -> (text) query;
-    "get_icp_usd_exchange": () -> (text);
+  "greet": (text : text) -> (text : text) query;
+  "get_icp_usd_exchange": () -> (text : text);
+  "get": () -> (Response) query;
+  "update": (merchant : Merchant) -> (Response);
 }

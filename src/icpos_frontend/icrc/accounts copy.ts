@@ -1,4 +1,4 @@
-import { ApiGet, isResponseOk } from "./axios";
+import { ApiGet, isResponseOk } from "../axios/axios";
 
 import { selector } from "recoil";
 
