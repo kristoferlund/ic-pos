@@ -1,13 +1,13 @@
 import {
   Merchant,
   _SERVICE,
-} from "../../declarations/icpos_backend/icpos_backend.did";
+} from "../../../../declarations/icpos_backend/icpos_backend.did";
 import { atom, useRecoilState } from "recoil";
 
 import { ActorSubclass } from "@dfinity/agent";
 import React from "react";
-import { createActor } from "../../declarations/icpos_backend";
-import { useAuth } from "../auth/hooks/useAuth";
+import { createActor } from "../../../../declarations/icpos_backend";
+import { useAuth } from "../../../auth/hooks/useAuth";
 
 type MerchantStateType = {
   initialized: boolean;
@@ -19,7 +19,7 @@ const MerchantState = atom<MerchantStateType>({
   default: { initialized: false, merchant: undefined },
 });
 
-export function useBackend() {
+export function useIcPosBackend() {
   const { isAuthenticated, authClient, hasLoggedIn, identity, agent } =
     useAuth();
   const [backend, setBackend] = React.useState<ActorSubclass<_SERVICE> | null>(

@@ -1,12 +1,8 @@
-# icpos
+# Ez-POS
 
-## Balance of
+Setup a simple store front to accept ckBTC payments on the Internet Computer.
 
-dfx canister --network local call icrc1-ledger icrc1_balance_of "(record {owner=(principal \"p6s35-k6zg4-lrg7t-jw4q2-34w5s-d3ous-kiwel-lnm7t-3xtb2-4k36n-yqe\")})"
-
-## Transfer
-
-dfx canister --network local call icrc1-ledger icrc1_transfer "(record {to=(record {owner=(principal \"p6s35-k6zg4-lrg7t-jw4q2-34w5s-d3ous-kiwel-lnm7t-3xtb2-4k36n-yqe\")}); amount=100_000})"
+---
 
 Welcome to your new icpos project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
 

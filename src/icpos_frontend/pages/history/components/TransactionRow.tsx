@@ -1,56 +1,43 @@
-import { Link } from "@tanstack/router";
-import { TransactionWithId } from "@dfinity/ledger/dist/candid/icrc1_index";
-
+import { Transaction } from "../../../icrc/types/transaction.type";
+import { formatCkBtc } from "../../../utils/formatCkBtc";
 import { shortenPrincipal } from "../../../utils/shortenPrincipal";
 import { useAuth } from "../../../auth/hooks/useAuth";
-import { formatCkBtc } from "../../../utils/formatCkBtc";
-
-function UnsupportedTransaction() {
-  return (
-    <div className="flex flex-row items-center justify-between w-full p-5">
-      <div>
-        <div className="text-sm font-medium text-gray-900">
-          Unsupported Transaction
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function TransactionRow({
   transaction,
 }: {
-  transaction: TransactionWithId;
+  transaction: Transaction;
 }) {
   const { identity } = useAuth();
-  if (!identity) return null;
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
 
-  const t = transaction.transaction;
-  const tr = t.transfer;
+  const principal =
+    params.get("principal") || identity?.getPrincipal().toString() || "";
 
-  if (t.kind !== "transfer") return <UnsupportedTransaction />;
+  const amount = transaction.amount;
 
-  const amount = tr[0]?.amount;
-
-  const displayDate = new Date(Number(t.timestamp) / 1e6)
+  const displayDate = new Date(Number(transaction.timestamp) / 1e6)
     .toISOString()
     .slice(0, 10);
 
+  const plusOrMinus =
+    transaction.from_owner.toString() === principal ? "-" : "+";
+
   return (
-    <Link
-      to={"/transaction/$transactionId"}
-      params={{
-        transactionId: transaction.id.toString(),
-      }}
-      className="block w-full px-2 py-2 no-underline border-b border-gray-200 hover:bg-gray-100"
-    >
-      <div className="flex flex-row items-center justify-between w-full p-5">
-        <div>
-          <div className="text-[0.8rem]">{displayDate}</div>
-          <div>{shortenPrincipal(tr[0]?.from.owner)}</div>
-        </div>
-        <div className="text-[1.4rem]">{formatCkBtc(amount)}</div>
+    <div className="flex flex-row items-center justify-between w-full p-5">
+      <div>
+        <div className="text-[0.8rem]">{displayDate}</div>
+        {transaction.from_owner.toString() === principal ? (
+          <div>To: {shortenPrincipal(transaction.to_owner)}</div>
+        ) : (
+          <div>From: {shortenPrincipal(transaction.from_owner)}</div>
+        )}
       </div>
-    </Link>
+      <div className="text-[1.4rem]">
+        {plusOrMinus}
+        {formatCkBtc(amount)}
+      </div>
+    </div>
   );
 }

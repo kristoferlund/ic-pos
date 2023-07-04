@@ -80,16 +80,3 @@
 a button {
   @apply text-white;
 }
-
-@keyframes scale-up {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.scale-up {
-  animation: scale-up 0.3s ease-in-out forwards;
-}

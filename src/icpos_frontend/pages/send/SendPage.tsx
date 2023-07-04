@@ -6,17 +6,32 @@ import { Link, Navigate } from "@tanstack/router";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { useBackend } from "../../hooks/useBackend";
 import Loading from "../../components/Loading";
 import { formatCkBtc } from "../../utils/formatCkBtc";
 import PrincipalPill from "../../components/PrincipalPill";
 import SendForm from "./components/SendForm";
 import useLedgerCanister from "../../canisters/ledger/hooks/useLedgerCanister";
+import React from "react";
+import { Result } from "react-zxing";
+import QRReader from "../../components/QRReader";
+import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
 
 export default function SendPage() {
-  const { merchantState } = useBackend();
+  const { merchantState } = useIcPosBackend();
   const { identity, hasLoggedIn } = useAuth();
   const { balance } = useLedgerCanister();
+
+  const [qrReaderOpen, setQrReaderOpen] = React.useState(false);
+  const [principal, setPrincipal] = React.useState("");
+
+  const handleQrResult = (result: Result) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = result as any;
+    if (p?.text) {
+      setPrincipal(p.toString());
+      setQrReaderOpen(false);
+    }
+  };
 
   // This page requires authentication
   if (!hasLoggedIn) {
@@ -35,19 +50,31 @@ export default function SendPage() {
           </Button>
         </Link>
         Send
-        <Link to="/merchant">
-          <Button variant="ghost" size="icon">
-            <QrCode className="w-4 h-4" />
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:text-black"
+          onClick={() => setQrReaderOpen(true)}
+        >
+          <QrCode className="w-4 h-4" />
+        </Button>
       </Header>
       <Main>
         <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
           <div className="grow" />
-          <div>{formatCkBtc(balance)} ckBTC</div>
-          <PrincipalPill principal={identity?.getPrincipal().toString()} />
-          <div className="grow" />
-          <SendForm />
+          {!qrReaderOpen && (
+            <>
+              <div>{formatCkBtc(balance)} ckBTC</div>
+              <PrincipalPill principal={identity?.getPrincipal().toString()} />
+              <div className="grow" />
+              <SendForm principal={principal} />
+            </>
+          )}
+          <QRReader
+            setVisible={setQrReaderOpen}
+            visible={qrReaderOpen}
+            onResult={handleQrResult}
+          />
         </div>
       </Main>
     </Page>

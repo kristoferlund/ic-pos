@@ -2,7 +2,7 @@ import { HttpAgent, Identity } from "@dfinity/agent";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
 import { AuthClient } from "@dfinity/auth-client";
-import { AuthContextType } from "../types/AuthContextType";
+import { AuthContextType } from "../types/auth-context.type";
 import { createAgent } from "@dfinity/utils";
 
 // Identity provider URL

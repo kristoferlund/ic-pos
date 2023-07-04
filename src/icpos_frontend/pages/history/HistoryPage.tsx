@@ -6,42 +6,31 @@ import Main from "../../components/Main";
 import Page from "../../components/Page";
 import TransactionRow from "./components/TransactionRow";
 import { X } from "lucide-react";
-import { useBackend } from "../../hooks/useBackend";
 import { useAuth } from "../../auth/hooks/useAuth";
-import useIndexCanister from "../../canisters/index/hooks/useIndexCanister";
-import React from "react";
-import { TransactionWithId } from "@dfinity/ledger/dist/candid/icrc1_index";
+import { useRecoilValue } from "recoil";
+import { Transactions } from "../../icrc/transactions";
 
 export default function HistoryPage() {
-  const { merchantState } = useBackend();
   const { identity } = useAuth();
-  const indexCanister = useIndexCanister();
-  const [transactions, setTransactions] = React.useState<
-    TransactionWithId[] | null
-  >(null);
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
 
-  React.useEffect(() => {
-    if (!indexCanister || !identity) return;
-    const getTransactions = async () => {
-      const transactions = await indexCanister.getTransactions({
-        max_results: 10n,
-        account: {
-          owner: identity.getPrincipal(),
-        },
-      });
-      setTransactions(transactions.transactions);
-      console.log(transactions);
-    };
-    getTransactions();
-  }, [indexCanister, identity]);
+  const principal =
+    params.get("principal") || identity?.getPrincipal().toString() || "";
 
-  if (!merchantState || !merchantState.merchant || !transactions)
-    return <Loading />;
+  const transactions = useRecoilValue(
+    Transactions({ id: principal, limit: 7 })
+  );
+
+  if (!transactions) return <Loading />;
 
   return (
     <Page>
       <Header>
-        <Link to="/merchant">
+        <Link
+          to={params.has("principal") ? "/receive" : "/merchant"}
+          search={params.has("principal") ? { principal } : undefined}
+        >
           <Button variant="ghost" size="icon">
             <X className="w-4 h-4" />
           </Button>
@@ -50,9 +39,9 @@ export default function HistoryPage() {
         <div className="w-4 h-4" />
       </Header>
       <Main>
-        <div className="flex flex-col items-center justify-top w-full grow md:h-[30px] md:overflow-y-scroll">
-          {transactions.map((transactionWithId, index) => (
-            <TransactionRow transaction={transactionWithId} key={index} />
+        <div className="flex flex-col items-center justify-top w-full grow md:h-[30px]">
+          {transactions.map((transaction, index) => (
+            <TransactionRow transaction={transaction} key={index} />
           ))}
         </div>
       </Main>

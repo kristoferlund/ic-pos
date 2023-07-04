@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../../../components/ui/button";
@@ -16,26 +15,32 @@ import { Input } from "../../../components/ui/input";
 import { Principal } from "@dfinity/principal";
 import { useNavigate } from "@tanstack/router";
 
+type SelectPrincipalFormProps = {
+  principal: string;
+};
+
 const SelectPrincipalSchema = z.object({
   principal: z.string(),
 });
 
 type SelectPrincipalSchemaType = z.infer<typeof SelectPrincipalSchema>;
 
-export default function SelectPrincipalForm() {
+export default function SelectPrincipalForm({
+  principal,
+}: SelectPrincipalFormProps) {
   const navigate = useNavigate();
 
   const form = useForm<SelectPrincipalSchemaType>({
     resolver: zodResolver(SelectPrincipalSchema),
     defaultValues: {
-      principal: "",
+      principal,
     },
   });
 
   async function onSubmit(values: SelectPrincipalSchemaType) {
-    let principal: Principal;
+    let p: Principal;
     try {
-      principal = Principal.fromText(values.principal);
+      p = Principal.fromText(values.principal);
     } catch (error) {
       return form.setError("principal", {
         message: "Invalid principal address",
@@ -45,7 +50,7 @@ export default function SelectPrincipalForm() {
     navigate({
       to: "/receive",
       search: {
-        principal: principal.toText(),
+        principal: p.toText(),
       },
     });
   }
@@ -72,16 +77,9 @@ export default function SelectPrincipalForm() {
           />
         </div>
 
-        {form.formState.isSubmitting ? (
-          <Button disabled className="w-full">
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Sending
-          </Button>
-        ) : (
-          <Button type="submit" className="w-full">
-            Send
-          </Button>
-        )}
+        <Button type="submit" className="w-full">
+          Monitor this principal
+        </Button>
       </form>
     </Form>
   );

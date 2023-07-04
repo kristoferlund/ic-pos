@@ -11,13 +11,13 @@ import PrincipalPill from "../../components/PrincipalPill";
 import ReceiveButton from "./components/ReceiveButton";
 import SendButton from "./components/SendButton";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { useBackend } from "../../hooks/useBackend";
 
 import useLedgerCanister from "../../canisters/ledger/hooks/useLedgerCanister";
 import { formatCkBtc } from "../../utils/formatCkBtc";
+import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
 
 export default function MerchantPage() {
-  const { merchantState } = useBackend();
+  const { merchantState } = useIcPosBackend();
   const { identity, hasLoggedIn } = useAuth();
   const { balance } = useLedgerCanister();
 
@@ -58,7 +58,7 @@ export default function MerchantPage() {
           <ReceiveButton />
           <SendButton />
           <div className="flex flex-col items-center justify-end grow">
-            <HistoryButton />
+            <HistoryButton principal={identity?.getPrincipal().toString()} />
           </div>
         </div>
       </Main>

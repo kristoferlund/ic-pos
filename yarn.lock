@@ -1451,6 +1451,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@zxing/library@npm:^0.19.2":
+  version: 0.19.3
+  resolution: "@zxing/library@npm:0.19.3"
+  dependencies:
+    "@zxing/text-encoding": ~0.9.0
+    ts-custom-error: ^3.2.1
+  dependenciesMeta:
+    "@zxing/text-encoding":
+      optional: true
+  checksum: 2a3adaccbde0e075ee4c3c73ab7fa9306be979dafeff6d373204470ea3cddab88608c6eca5e891c7d5e693c5df0f0664e14ea0a74d38e0658fc7464f5c986474
+  languageName: node
+  linkType: hard
+
+"@zxing/text-encoding@npm:~0.9.0":
+  version: 0.9.0
+  resolution: "@zxing/text-encoding@npm:0.9.0"
+  checksum: c23b12aee7639382e4949961304a1294776afaffa40f579e09ffecd0e5e68cf26ef3edd75009de46da8a536e571448755ca68b3e2ea707d53793c0edb2e2c34a
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -2844,6 +2864,7 @@ __metadata:
     react-dom: ^18.2.0
     react-hook-form: ^7.45.0
     react-hot-toast: ^2.4.1
+    react-zxing: ^1.1.4
     recoil: ^0.7.7
     tailwind-merge: ^1.13.2
     tailwindcss: ^3.3.2
@@ -3840,6 +3861,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-zxing@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "react-zxing@npm:1.1.4"
+  dependencies:
+    "@zxing/library": ^0.19.2
+  peerDependencies:
+    react: ^16.8.0  || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0  || ^17.0.0 || ^18.0.0
+  checksum: 18833abc4787667e6b57f1bd212a5e824b49042a5d1833a0461cddb4caf5af1f165d76fa8aa5bcba5633588693aad6cd85870fc8fe36f2c7d78a1e57b1d8fe80
+  languageName: node
+  linkType: hard
+
 "react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
@@ -4342,6 +4375,13 @@ __metadata:
   dependencies:
     is-number: ^7.0.0
   checksum: f76fa01b3d5be85db6a2a143e24df9f60dd047d151062d0ba3df62953f2f697b16fe5dad9b0ac6191c7efc7b1d9dcaa4b768174b7b29da89d4428e64bc0a20ed
+  languageName: node
+  linkType: hard
+
+"ts-custom-error@npm:^3.2.1":
+  version: 3.3.1
+  resolution: "ts-custom-error@npm:3.3.1"
+  checksum: 50a1e825fced68d70049bd8d282379a635e43aa023a370fa8e736b12a6edba7f18a2d731fa194ac35303a8b625be56e121bdb31d8a0318250d1a8b277059fce3
   languageName: node
   linkType: hard
 

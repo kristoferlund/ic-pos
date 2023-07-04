@@ -5,10 +5,10 @@ import LoginButton from "./components/LoginButton";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
 import { ReactNode } from "react";
-import { useBackend } from "../../hooks/useBackend";
+import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
 
 export default function StartPage(): ReactNode {
-  const { merchantState } = useBackend();
+  const { merchantState } = useIcPosBackend();
 
   // If the merchant state is initialized it means that the backend actor is available
   if (merchantState.initialized) {
@@ -21,7 +21,7 @@ export default function StartPage(): ReactNode {
   }
 
   return (
-    <Page authentication={false}>
+    <Page>
       <Main>
         <div className="flex flex-col items-center justify-between p-10 space-y-5 grow">
           <div className="flex items-center justify-center w-full p-10">

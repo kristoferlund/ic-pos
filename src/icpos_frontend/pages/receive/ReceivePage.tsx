@@ -11,13 +11,13 @@ import PrincipalPill from "../../components/PrincipalPill";
 import { QRCodeSVG } from "qrcode.react";
 import TransactionOverlay from "./components/TransactionOverlay";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { useBackend } from "../../hooks/useBackend";
+import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
 
 export default function ReceivePage() {
-  const { merchantState } = useBackend();
+  const { merchantState } = useIcPosBackend();
   const { identity } = useAuth();
-  const s = window.location.search;
-  const params = new URLSearchParams(s);
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
 
   if (!params.has("principal")) {
     if (!merchantState || !merchantState.merchant || !identity)
@@ -50,7 +50,7 @@ export default function ReceivePage() {
               )}
               <PrincipalPill principal={principal} />
             </div>
-            <HistoryButton />
+            <HistoryButton principal={principal} />
           </div>
         </Main>
       </div>

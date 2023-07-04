@@ -1,62 +1,61 @@
 import { BadgeCheck, X } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
+import PrincipalPill from "../../../components/PrincipalPill";
 import React from "react";
-import { useAuth } from "../../../auth/hooks/useAuth";
-import useIndexCanister from "../../../canisters/index/hooks/useIndexCanister";
-import { useState } from "react";
-import { TransactionWithId } from "@dfinity/ledger/dist/candid/icrc1_index";
+import { Transaction } from "../../../icrc/types/transaction.type";
+import { fetchTransactions } from "../../../icrc/transactions";
 import { formatCkBtc } from "../../../utils/formatCkBtc";
+import { isResponseOk } from "../../../axios/axios";
+import { useAuth } from "../../../auth/hooks/useAuth";
+import { useState } from "react";
 
 export default function TransactionOverlay() {
   const { identity } = useAuth();
-  const indexCanister = useIndexCanister();
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
+
+  const principal =
+    params.get("principal") || identity?.getPrincipal().toString() || "";
 
   const [latestTransaction, setLatestTransaction] = useState<
-    TransactionWithId | undefined
+    Transaction | undefined
   >(undefined);
   const [receivedTransaction, setReceivedTransaction] = useState<
-    TransactionWithId | undefined
+    Transaction | undefined
   >(undefined);
 
   const [close, setClose] = useState<boolean>(false);
 
   React.useEffect(() => {
-    if (!indexCanister || !identity) return;
+    if (!principal) return;
     const init = async () => {
-      const principal = identity.getPrincipal();
-      const response = await indexCanister.getTransactions({
-        max_results: 1n,
-        account: {
-          owner: principal,
-        },
-      });
-      setLatestTransaction(response.transactions[0]);
+      const response = await fetchTransactions(principal, 1);
+      if (isResponseOk(response)) {
+        setLatestTransaction(response.data.data[0]);
+      }
     };
     init();
-  }, [indexCanister, identity]);
+  }, [principal]);
 
   React.useEffect(() => {
-    if (!indexCanister || !identity) return;
+    if (!principal || !latestTransaction) return;
     const pollTransactions = setInterval(async () => {
-      const principal = identity.getPrincipal();
-      const response = await indexCanister.getTransactions({
-        max_results: 1n,
-        account: {
-          owner: principal,
-        },
-      });
-      if (
-        latestTransaction &&
-        response.transactions[0].id === latestTransaction.id
-      ) {
-        return;
+      const response = await fetchTransactions(principal, 1);
+      if (latestTransaction && isResponseOk(response)) {
+        const t = response.data.data[0];
+        if (
+          t.index !== latestTransaction.index &&
+          t.kind === "transfer" &&
+          t.from_owner !== principal
+        ) {
+          setReceivedTransaction(t);
+          setLatestTransaction(t);
+        }
       }
-      setReceivedTransaction(response.transactions[0]);
-      setLatestTransaction(response.transactions[0]);
     }, 15000); // 15 seconds
     return () => clearInterval(pollTransactions);
-  }, [indexCanister, identity, latestTransaction]);
+  }, [principal, latestTransaction]);
 
   let classNames =
     "absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full space-y-10 text-white bg-cyan-800 md:rounded-lg";
@@ -73,7 +72,10 @@ export default function TransactionOverlay() {
     return () => clearInterval(interval);
   };
 
-  if (!receivedTransaction) return null;
+  // Only show if there is a received transaction
+  if (!receivedTransaction) {
+    return null;
+  }
 
   return (
     <div className={classNames}>
@@ -86,9 +88,8 @@ export default function TransactionOverlay() {
       </div>
       <BadgeCheck className="w-36 h-36" />
       <div className="text-4xl font-bold">Payment Received!</div>
-      <div>
-        {formatCkBtc(receivedTransaction.transaction.mint[0]?.amount)} ckBTC
-      </div>
+      <PrincipalPill principal={receivedTransaction.from_owner} />
+      <div>{formatCkBtc(receivedTransaction.amount)} ckBTC</div>
       <div className="grow" />
     </div>
   );

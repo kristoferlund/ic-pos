@@ -1,6 +1,6 @@
 import { ApiGet, isResponseOk } from "../axios/axios";
 
-import { Transaction } from "./types/transaction";
+import { Transaction } from "./types/transaction.type";
 import axios from "axios";
 import { selectorFamily } from "recoil";
 

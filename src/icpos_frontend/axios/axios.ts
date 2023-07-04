@@ -1,6 +1,8 @@
 import { SerializableParam, selectorFamily } from "recoil";
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 
+import toast from "react-hot-toast";
+
 export interface ApiErrorResponseData {
   errors?: Array<string>;
   message: string;
@@ -36,13 +38,6 @@ export type RequestParams = {
   handleErrorsAutomatically?: boolean;
 };
 
-// type RequestDataParam = {
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   data: any;
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   file?: any;
-// };
-
 /**
  * Handle error responses (excluding initial 401 response). Any HTTP Code which is not 2xx will be considered as error
  *
@@ -54,26 +49,10 @@ export const handleErrors = (
 ): AxiosError => {
   // Handling errors automatically means the error will be displayed to the user with a toast.
   // If not handled automatically, the error will just be logged to the console and returned.
-  if (!handleErrorsAutomatically) {
-    console.error(err);
-    return err;
+  if (handleErrorsAutomatically) {
+    toast.error(err.message);
   }
-
-  // if (err?.response) {
-  //   // If the response is a json blob, parse it and display the error message
-  //   if (isJsonBlob(err.response.data)) {
-  //     void (err.response.data as Blob).text().then((text) => {
-  //       const json = JSON.parse(text);
-  //       toast.error(json.message);
-  //     });
-  //   } else if ((err.response.data as Error).message) {
-  //     toast.error((err.response.data as Error).message);
-  //   } else {
-  //     toast.error('Something went wrong');
-  //   }
-  // } else if (!err.response) {
-  //   toast.error('Server did not respond');
-  // }
+  console.error(err);
   return err;
 };
 

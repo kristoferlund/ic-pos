@@ -2,9 +2,18 @@ import { Button } from "./ui/button";
 import { Inbox } from "lucide-react";
 import { Link } from "@tanstack/router";
 
-export default function ReceiveButton() {
+type HistoryButtonProps = {
+  principal: string;
+};
+
+export default function HistoryButton({ principal }: HistoryButtonProps) {
   return (
-    <Link to="/history">
+    <Link
+      to="/history"
+      search={{
+        principal,
+      }}
+    >
       <Button size={"lg"} className="w-56">
         <Inbox className="w-4 h-4 mr-2" />
         History

@@ -6,9 +6,23 @@ import { Link } from "@tanstack/router";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
 import SelectPrincipalForm from "./components/SelectPrincipalForm";
-import { toast } from "react-hot-toast";
+import React from "react";
+import QRReader from "../../components/QRReader";
+import { Result } from "react-zxing";
 
-export default function ReceiveSelectPrincipal() {
+export default function ReceiveSelectPrincipalPage() {
+  const [qrReaderOpen, setQrReaderOpen] = React.useState(false);
+  const [principal, setPrincipal] = React.useState("");
+
+  const handleQrResult = (result: Result) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = result as any;
+    if (p?.text) {
+      setPrincipal(p.toString());
+      setQrReaderOpen(false);
+    }
+  };
+
   return (
     <Page>
       <Header>
@@ -21,9 +35,8 @@ export default function ReceiveSelectPrincipal() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => {
-            toast("Not yet implemented");
-          }}
+          onClick={() => setQrReaderOpen(!qrReaderOpen)}
+          className="hover:text-black"
         >
           <QrCode className="w-4 h-4" />
         </Button>
@@ -35,7 +48,12 @@ export default function ReceiveSelectPrincipal() {
             to access this feature.
           </div>
           <div className="grow" />
-          <SelectPrincipalForm />
+          <QRReader
+            setVisible={setQrReaderOpen}
+            visible={qrReaderOpen}
+            onResult={handleQrResult}
+          />
+          {!qrReaderOpen && <SelectPrincipalForm principal={principal} />}
         </div>
       </Main>
     </Page>

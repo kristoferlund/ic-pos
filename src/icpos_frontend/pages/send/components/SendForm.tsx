@@ -18,6 +18,10 @@ import { Principal } from "@dfinity/principal";
 import { toast } from "react-hot-toast";
 import { convertToBigInt } from "../../../utils/convertToBigInt";
 
+type SendFormProps = {
+  principal: string;
+};
+
 const SendSchema = z.object({
   to: z.string(),
   amount: z.string(),
@@ -25,13 +29,13 @@ const SendSchema = z.object({
 
 type SendSchemaType = z.infer<typeof SendSchema>;
 
-export default function SendForm() {
+export default function SendForm({ principal }: SendFormProps) {
   const { ledgerCanister, balance } = useLedgerCanister();
 
   const form = useForm<SendSchemaType>({
     resolver: zodResolver(SendSchema),
     defaultValues: {
-      to: "",
+      to: principal,
       amount: "0",
     },
   });
@@ -83,9 +87,7 @@ export default function SendForm() {
       });
 
       if (response) {
-        toast.success(
-          "Transfer successful. Please wait for it to be confirmed."
-        );
+        toast.success("Transfer successful.");
       } else {
         toast.error("An error occurred.");
       }

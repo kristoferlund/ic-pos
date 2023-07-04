@@ -40,17 +40,11 @@ const receiveRoute = new Route({
   component: lazy(() => import("./pages/receive/ReceivePage")),
 });
 
-const receivePrincipalRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/receive/$principal",
-  component: lazy(() => import("./pages/receive/ReceivePage")),
-});
-
 const receiveSelectPrincipalRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/receive-select-principal",
   component: lazy(
-    () => import("./pages/receive-select-principal/ReceiveSelectPrincipal")
+    () => import("./pages/receive-select-principal/ReceiveSelectPrincipalPage")
   ),
 });
 const sendRoute = new Route({
@@ -65,12 +59,6 @@ const historyRoute = new Route({
   component: lazy(() => import("./pages/history/HistoryPage")),
 });
 
-const transactionRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/transaction/$transactionId",
-  component: lazy(() => import("./pages/transaction/TransactionPage")),
-});
-
 const notFoundRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "*",
@@ -83,11 +71,9 @@ const routes = [
   initialConfigRoute,
   configRoute,
   receiveRoute,
-  receivePrincipalRoute,
   receiveSelectPrincipalRoute,
   sendRoute,
   historyRoute,
-  transactionRoute,
   notFoundRoute,
 ];
 
