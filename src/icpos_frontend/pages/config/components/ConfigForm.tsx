@@ -7,18 +7,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../components/ui/form";
+} from "../../../components/ui/form";
 
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import { Loader2 } from "lucide-react";
 import React from "react";
-import { Switch } from "../components/ui/switch";
+import { Switch } from "../../../components/ui/switch";
 import toast from "react-hot-toast";
-import { useBackend } from "../hooks/useBackend";
+import { useBackend } from "../../../hooks/useBackend";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "@tanstack/router";
 
 const MerchantSchema = z.object({
   name: z.string().min(2, {
@@ -34,6 +35,7 @@ type MerchantSchemaType = z.infer<typeof MerchantSchema>;
 
 export default function ConfigForm() {
   const { merchantState, updateMerchant } = useBackend();
+  const navigate = useNavigate();
 
   const form = useForm<MerchantSchemaType>({
     resolver: zodResolver(MerchantSchema),
@@ -80,6 +82,7 @@ export default function ConfigForm() {
 
     if (response && response.status === 200) {
       toast.success("Merchant settings updated.");
+      navigate({ to: "/merchant" });
     } else {
       toast.error(response?.error_text[0] || "An error occurred.");
     }
@@ -87,7 +90,7 @@ export default function ConfigForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-5">
         <FormField
           control={form.control}
           name="name"
@@ -119,9 +122,6 @@ export default function ConfigForm() {
                     />
                   </FormControl>
                 </div>
-                <FormDescription>
-                  Receive an email when a new payment is received.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -143,9 +143,6 @@ export default function ConfigForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  Receive email notifications to this address.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -167,9 +164,6 @@ export default function ConfigForm() {
                     />
                   </FormControl>
                 </div>
-                <FormDescription>
-                  Receive a text message when a new payment is received.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -191,9 +185,6 @@ export default function ConfigForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  Receive text messages to this phone number.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

@@ -1,10 +1,11 @@
+import { Link, Navigate } from "@tanstack/router";
+
+import { ReactComponent as CkBTC } from "../../assets/ckBTC.svg";
 import LoginButton from "./components/LoginButton";
-import MonitorButton from "./components/MonitorButton";
-import { Navigate } from "@tanstack/router";
-import { ReactNode } from "react";
-import { useBackend } from "../../hooks/useBackend";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
+import { ReactNode } from "react";
+import { useBackend } from "../../hooks/useBackend";
 
 export default function StartPage(): ReactNode {
   const { merchantState } = useBackend();
@@ -22,13 +23,21 @@ export default function StartPage(): ReactNode {
   return (
     <Page authentication={false}>
       <Main>
-        <div className="flex flex-col items-center justify-center space-y-5">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </p>
+        <div className="flex flex-col items-center justify-between p-10 space-y-5 grow">
+          <div className="flex items-center justify-center w-full p-10">
+            <CkBTC />
+          </div>
+          <div className="text-4xl font-bold">Ez-POS </div>
+          <div>
+            Setup a simple store front to accept ckBTC payments on the Internet
+            Computer. Sign in with Internet Identity to get started or{" "}
+            <Link to="/receive-select-principal">
+              monitor any address without signing in
+            </Link>
+            .
+          </div>
+          <div className="grow" />
           <LoginButton />
-          <MonitorButton />
         </div>
       </Main>
     </Page>

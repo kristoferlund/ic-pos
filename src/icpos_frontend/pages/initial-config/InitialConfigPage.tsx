@@ -1,9 +1,9 @@
 import { Button } from "../../components/ui/button";
-import ConfigForm from "../../components/ConfigForm";
+import ConfigForm from "./components/ConfigForm";
 import Header from "../../components/Header";
 import { LogOut } from "lucide-react";
-import Page from "../../components/Page";
 import Main from "../../components/Main";
+import Page from "../../components/Page";
 
 export default function InitialConfigPage() {
   return (
@@ -21,8 +21,13 @@ export default function InitialConfigPage() {
         <div className="w-4 h-4" />
       </Header>
       <Main>
-        <p>Some smart text about this is the first time etc.</p>
-        <ConfigForm />
+        <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
+          <div>
+            Before you begin accepting payments, give your store a name!
+          </div>
+          <div className="grow" />
+          <ConfigForm />
+        </div>
       </Main>
     </Page>
   );

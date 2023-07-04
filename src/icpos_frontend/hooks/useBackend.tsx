@@ -1,10 +1,10 @@
-import { ActorSubclass, HttpAgent } from "@dfinity/agent";
 import {
   Merchant,
   _SERVICE,
 } from "../../declarations/icpos_backend/icpos_backend.did";
 import { atom, useRecoilState } from "recoil";
 
+import { ActorSubclass } from "@dfinity/agent";
 import React from "react";
 import { createActor } from "../../declarations/icpos_backend";
 import { useAuth } from "../auth/hooks/useAuth";
@@ -20,23 +20,20 @@ const MerchantState = atom<MerchantStateType>({
 });
 
 export function useBackend() {
-  const { isAuthenticated, authClient, hasLoggedIn, identity } = useAuth();
+  const { isAuthenticated, authClient, hasLoggedIn, identity, agent } =
+    useAuth();
   const [backend, setBackend] = React.useState<ActorSubclass<_SERVICE> | null>(
     null
   );
   const [merchantState, setMerchantState] = useRecoilState(MerchantState);
 
   React.useEffect(() => {
-    if (!isAuthenticated || !authClient || !hasLoggedIn) return;
-    const agent = new HttpAgent({
-      identity,
-      host: import.meta.env.VITE_IC_HOST,
-    });
+    if (!isAuthenticated || !authClient || !hasLoggedIn || !agent) return;
     const actor = createActor(import.meta.env.VITE_CANISTER_ID_ICPOS_BACKEND, {
       agent,
     });
     setBackend(actor);
-  }, [isAuthenticated, authClient, hasLoggedIn, identity]);
+  }, [isAuthenticated, authClient, hasLoggedIn, identity, agent]);
 
   React.useEffect(() => {
     if (!backend) return;

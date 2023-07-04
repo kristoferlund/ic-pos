@@ -1,28 +1,39 @@
 import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useRouter,
-  useRouterContext,
-  useSearch,
-} from "@tanstack/router";
-import Page from "../../components/Page";
-import TransactionRow from "./components/TransactionRow";
-import { Transactions } from "../../icrc/transactions";
-import { X } from "lucide-react";
-import { useBackend } from "../../hooks/useBackend";
-import { useRecoilValue } from "recoil";
+import { Link } from "@tanstack/router";
 import Loading from "../../components/Loading";
 import Main from "../../components/Main";
+import Page from "../../components/Page";
+import TransactionRow from "./components/TransactionRow";
+import { X } from "lucide-react";
+import { useBackend } from "../../hooks/useBackend";
+import { useAuth } from "../../auth/hooks/useAuth";
+import useIndexCanister from "../../canisters/index/hooks/useIndexCanister";
+import React from "react";
+import { TransactionWithId } from "@dfinity/ledger/dist/candid/icrc1_index";
 
 export default function HistoryPage() {
   const { merchantState } = useBackend();
-  // const principal = identity?.getPrincipal().toString();
-  const principal =
-    "237zc-vao7e-qxrtp-dampy-4rqvq-3eg3b-elvly-q2xnl-jqlpj-d2jpt-xqe";
-  const transactions = useRecoilValue(Transactions(principal));
+  const { identity } = useAuth();
+  const indexCanister = useIndexCanister();
+  const [transactions, setTransactions] = React.useState<
+    TransactionWithId[] | null
+  >(null);
+
+  React.useEffect(() => {
+    if (!indexCanister || !identity) return;
+    const getTransactions = async () => {
+      const transactions = await indexCanister.getTransactions({
+        max_results: 10n,
+        account: {
+          owner: identity.getPrincipal(),
+        },
+      });
+      setTransactions(transactions.transactions);
+      console.log(transactions);
+    };
+    getTransactions();
+  }, [indexCanister, identity]);
 
   if (!merchantState || !merchantState.merchant || !transactions)
     return <Loading />;
@@ -39,9 +50,9 @@ export default function HistoryPage() {
         <div className="w-4 h-4" />
       </Header>
       <Main>
-        <div className="flex flex-col items-center justify-center w-full">
-          {transactions.map((transaction) => (
-            <TransactionRow transaction={transaction} key={transaction.index} />
+        <div className="flex flex-col items-center justify-top w-full grow md:h-[30px] md:overflow-y-scroll">
+          {transactions.map((transactionWithId, index) => (
+            <TransactionRow transaction={transactionWithId} key={index} />
           ))}
         </div>
       </Main>

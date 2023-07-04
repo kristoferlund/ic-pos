@@ -1,4 +1,4 @@
-import { Transaction } from "./types/Transaction";
+import { Transaction } from "./types/transaction";
 import { Transactions } from "./transactions";
 import { selectorFamily } from "recoil";
 
@@ -15,7 +15,7 @@ export const SingleTransaction = selectorFamily<
   get:
     (params: TransactionParams) =>
     async ({ get }) => {
-      const transactions = get(Transactions(params.id));
+      const transactions = get(Transactions({ id: params.id }));
       return transactions.find((t) => t.index === params.index);
     },
 });

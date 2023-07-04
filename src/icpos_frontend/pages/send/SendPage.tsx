@@ -2,17 +2,26 @@ import { QrCode, X } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
-import { Link } from "@tanstack/router";
+import { Link, Navigate } from "@tanstack/router";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
-import { shortenPrincipal } from "../../utils/shortenPrincipal";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useBackend } from "../../hooks/useBackend";
 import Loading from "../../components/Loading";
+import { formatCkBtc } from "../../utils/formatCkBtc";
+import PrincipalPill from "../../components/PrincipalPill";
+import SendForm from "./components/SendForm";
+import useLedgerCanister from "../../canisters/ledger/hooks/useLedgerCanister";
 
 export default function SendPage() {
   const { merchantState } = useBackend();
-  const { identity } = useAuth();
+  const { identity, hasLoggedIn } = useAuth();
+  const { balance } = useLedgerCanister();
+
+  // This page requires authentication
+  if (!hasLoggedIn) {
+    return <Navigate to="/" />;
+  }
 
   if (!merchantState || !merchantState.merchant || !identity)
     return <Loading />;
@@ -33,17 +42,12 @@ export default function SendPage() {
         </Link>
       </Header>
       <Main>
-        <div className="flex flex-col items-center justify-center space-y-5">
-          <p>
-            {merchantState.merchant.name}
-            <br />
-            {identity?.getPrincipal() &&
-              shortenPrincipal(identity.getPrincipal().toString())}
-          </p>
-          <p>FORM</p>
-          <Button size={"lg"} className="w-48">
-            Send
-          </Button>
+        <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
+          <div className="grow" />
+          <div>{formatCkBtc(balance)} ckBTC</div>
+          <PrincipalPill principal={identity?.getPrincipal().toString()} />
+          <div className="grow" />
+          <SendForm />
         </div>
       </Main>
     </Page>

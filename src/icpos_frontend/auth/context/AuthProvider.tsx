@@ -1,10 +1,9 @@
-import { ActorSubclass, Identity } from "@dfinity/agent";
+import { HttpAgent, Identity } from "@dfinity/agent";
 import { ReactNode, createContext, useEffect, useState } from "react";
-import { canisterId, createActor } from "../../../declarations/icpos_frontend";
 
 import { AuthClient } from "@dfinity/auth-client";
 import { AuthContextType } from "../types/AuthContextType";
-import { _SERVICE } from "../../../declarations/icpos_frontend/icpos_frontend.did";
+import { createAgent } from "@dfinity/utils";
 
 // Identity provider URL
 const IDENTITY_PROVIDER = `${import.meta.env.VITE_IC_HOST}/?canisterId=${
@@ -19,7 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // State variables
   const [authClient, setAuthClient] = useState<AuthClient | undefined>();
   const [identity, setIdentity] = useState<Identity | undefined>(undefined);
-  const [actor, setActor] = useState<ActorSubclass<_SERVICE> | undefined>();
+  const [agent, setAgent] = useState<HttpAgent | undefined>(undefined);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
     undefined
   );
@@ -44,15 +43,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!authClient) return;
     authClient.login({
       identityProvider: IDENTITY_PROVIDER,
-      onSuccess: () => {
+      onSuccess: async () => {
+        // Save the identity
         const identity = authClient.getIdentity();
         setIdentity(identity);
-        const actor = createActor(canisterId as string, {
-          agentOptions: {
-            identity: authClient?.getIdentity(),
-          },
+
+        // Create an agent
+        const agent = await createAgent({
+          identity,
+          host: import.meta.env.VITE_IC_HOST,
         });
-        setActor(actor);
+        await agent.fetchRootKey();
+        setAgent(agent);
+
         setIsAuthenticated(true);
         setHasLoggedIn(true);
       },
@@ -62,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Function to handle logout
   const logout = () => {
     authClient?.logout();
-    setActor(undefined);
+    // setActor(undefined);
     setIdentity(undefined);
     setIsAuthenticated(false);
   };
@@ -72,8 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         authClient,
-        actor,
         identity,
+        agent,
         isAuthenticated,
         hasLoggedIn,
         login,

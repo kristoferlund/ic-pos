@@ -1,22 +1,30 @@
 import { ApiGet, isResponseOk } from "../axios/axios";
 
-import { Transaction } from "./types/Transaction";
+import { Transaction } from "./types/transaction";
+import axios from "axios";
 import { selectorFamily } from "recoil";
 
 type TransactionResponse = {
   data: Transaction[];
 };
 
-export const Transactions = selectorFamily<Transaction[], string>({
+export type TransactionsParams = {
+  id: string | undefined;
+  limit?: number;
+};
+
+export const Transactions = selectorFamily<Transaction[], TransactionsParams>({
   key: "Transaction",
   get:
-    (id: string) =>
+    (params: TransactionsParams) =>
     async ({ get }) => {
+      const { id, limit = 0 } = params;
+      if (!id) return [];
       const response = get(
         ApiGet<TransactionResponse>({
           url: `/ledgers/${
             import.meta.env.VITE_CANISTER_ID_ICRC
-          }/accounts/${id}/transactions`,
+          }/accounts/${id}/transactions?limit=${limit}`,
         })
       );
       if (isResponseOk(response)) {
@@ -25,3 +33,14 @@ export const Transactions = selectorFamily<Transaction[], string>({
       return [];
     },
 });
+
+export const fetchTransactions = async (id: string, limit = 0) => {
+  const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_ICRC_API_URL,
+  });
+  return apiClient.get<TransactionResponse>(
+    `/ledgers/${
+      import.meta.env.VITE_CANISTER_ID_ICRC
+    }/accounts/${id}/transactions?limit=${limit}`
+  );
+};

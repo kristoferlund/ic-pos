@@ -14,15 +14,18 @@
     "dfx:generate": "dfx generate icpos_backend"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.15.6",
-    "@dfinity/candid": "^0.15.6",
-    "@dfinity/principal": "^0.15.6",
+    "@dfinity/agent": "^0.16.0",
+    "@dfinity/candid": "^0.16.0",
+    "@dfinity/ledger": "^0.0.10",
+    "@dfinity/principal": "^0.16.0",
+    "@dfinity/utils": "^0.0.17",
     "@hookform/resolvers": "^3.1.1",
     "@internet-identity-labs/react-ic-ii-auth": "^0.0.19",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
+    "@tanstack/react-loaders": "^0.0.1-beta.53",
     "@tanstack/router": "0.0.1-beta.86",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.6.0",
@@ -36,12 +39,11 @@
     "react-hot-toast": "^2.4.1",
     "recoil": "^0.7.7",
     "tailwind-merge": "^1.13.2",
-    "tailwindcss-animate": "^1.0.6",
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@dfinity/auth-client": "^0.15.7",
-    "@dfinity/identity": "^0.15.7",
+    "@dfinity/auth-client": "^0.16.0",
+    "@dfinity/identity": "^0.16.0",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "@types/react": "^18.0.37",
@@ -55,7 +57,9 @@
     "eslint-plugin-react-refresh": "^0.3.4",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
+    "tailwindcss-animate": "^1.0.6",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^4.3.9",
+    "vite-plugin-svgr": "^3.2.0"
   }
 }

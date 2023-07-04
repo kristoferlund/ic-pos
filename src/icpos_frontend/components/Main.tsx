@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
 
 export default function Main({ children }: { children: ReactNode }) {
-  return <div className="p-5">{children}</div>;
+  return <div className="flex flex-col grow">{children}</div>;
 }
