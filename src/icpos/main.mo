@@ -133,9 +133,9 @@ actor class Main(_startBlock : Nat) {
   };
 
   // Function to set a global timer to call `notify` every 20 seconds
-  // system func timer(setGlobalTimer : Nat64 -> ()) : async () {
-  //   let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
-  //   setGlobalTimer(next);
-  //   let response = await notify();
-  // };
+  system func timer(setGlobalTimer : Nat64 -> ()) : async () {
+    let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
+    setGlobalTimer(next);
+    let response = await notify();
+  };
 };
