@@ -10,9 +10,6 @@
 # dfx temporary files
 .dfx/
 
-# generated files
-src/declarations/
-
 # rust
 target/
 
@@ -32,3 +29,6 @@ yarn-error.log*
 
 # yarn cache
 .yarn/cache
+
+# misc
+scratch/

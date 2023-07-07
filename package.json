@@ -1,17 +1,37 @@
 {
-  "name": "icpos_frontend",
+  "name": "ic-pos",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "description": "Accept Bitcoin payments (ckBTC) on the Internet Computer using this simple Point of Sale (POS) application.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kristoferlund/ic-pos"
+  },
+  "bugs": "https://github.com/kristoferlund/ic-pos/issues",
+  "homepage": "https://github.com/kristoferlund/ic-pos",
+  "author": "Kristofer Lund <kristofer@fmckl.se>",
+  "keywords": [
+    "pos",
+    "bitcoin",
+    "ckbtc",
+    "dfinity",
+    "ic",
+    "vite",
+    "react",
+    "tailwindcss",
+    "typescript"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "dfx:start": "dfx start --background",
-    "dfx:deploy:local": "dfx deploy --network=local",
-    "dfx:deploy:ic": "dfx deploy --network=ic",
-    "dfx:generate": "dfx generate icpos_backend"
+    "dfx:deploy:local": "dfx deploy --network=local --argument '(0)'",
+    "dfx:deploy:ic": "dfx deploy --network=ic --argument '(64051)'",
+    "dfx:generate": "dfx generate icpos"
   },
   "dependencies": {
     "@dfinity/agent": "^0.16.0",

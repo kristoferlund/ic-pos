@@ -1,12 +1,11 @@
 {
   "canisters": {
-    "icpos_backend": {
-      "candid": "src/icpos_backend/icpos_backend.did",
-      "package": "icpos_backend",
-      "type": "rust"
+    "icpos": {
+      "main": "src/icpos/main.mo",
+      "type": "motoko"
     },
     "icpos_frontend": {
-      "dependencies": ["icpos_backend"],
+      "dependencies": ["icpos"],
       "frontend": {
         "entrypoint": "dist/index.html"
       },

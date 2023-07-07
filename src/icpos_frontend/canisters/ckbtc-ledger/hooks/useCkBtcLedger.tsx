@@ -3,7 +3,7 @@ import { Principal } from "@dfinity/principal";
 import React from "react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
-export default function useLedgerCanister() {
+export default function useCkBtcLedger() {
   const { identity, agent } = useAuth();
   const [ledgerCanister, setLedgerCanister] = React.useState<
     IcrcLedgerCanister | undefined

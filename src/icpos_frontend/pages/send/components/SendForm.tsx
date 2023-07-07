@@ -1,22 +1,23 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "../../../components/ui/button";
 import {
   Form,
+  FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  FormDescription,
   FormMessage,
 } from "../../../components/ui/form";
+
+import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
-import useLedgerCanister from "../../../canisters/ledger/hooks/useLedgerCanister";
+import { Loader2 } from "lucide-react";
 import { Principal } from "@dfinity/principal";
-import { toast } from "react-hot-toast";
 import { convertToBigInt } from "../../../utils/convertToBigInt";
+import { toast } from "react-hot-toast";
+import useCkBtcLedger from "../../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type SendFormProps = {
   principal: string;
@@ -30,7 +31,7 @@ const SendSchema = z.object({
 type SendSchemaType = z.infer<typeof SendSchema>;
 
 export default function SendForm({ principal }: SendFormProps) {
-  const { ledgerCanister, balance } = useLedgerCanister();
+  const { ledgerCanister, balance } = useCkBtcLedger();
 
   const form = useForm<SendSchemaType>({
     resolver: zodResolver(SendSchema),

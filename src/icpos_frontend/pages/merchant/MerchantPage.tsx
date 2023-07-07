@@ -1,25 +1,24 @@
 import { Cog, LogOut } from "lucide-react";
+import { Link, Navigate } from "@tanstack/router";
 
 import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
 import HistoryButton from "../../components/HistoryButton";
-import { Link, Navigate } from "@tanstack/router";
 import Loading from "../../components/Loading";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import ReceiveButton from "./components/ReceiveButton";
 import SendButton from "./components/SendButton";
-import { useAuth } from "../../auth/hooks/useAuth";
-
-import useLedgerCanister from "../../canisters/ledger/hooks/useLedgerCanister";
 import { formatCkBtc } from "../../utils/formatCkBtc";
-import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
+import { useAuth } from "../../auth/hooks/useAuth";
+import useCkBtcLedger from "../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
+import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
 export default function MerchantPage() {
-  const { merchantState } = useIcPosBackend();
-  const { identity, hasLoggedIn } = useAuth();
-  const { balance } = useLedgerCanister();
+  const { merchantState } = useIcPos();
+  const { identity, hasLoggedIn, logout } = useAuth();
+  const { balance } = useCkBtcLedger();
 
   // This page requires authentication
   if (!hasLoggedIn) {
@@ -37,6 +36,7 @@ export default function MerchantPage() {
             <LogOut
               className="w-4 h-4"
               onClick={() => {
+                logout && logout();
                 window.location.href = "/";
               }}
             />

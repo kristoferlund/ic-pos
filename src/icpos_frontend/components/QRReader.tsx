@@ -31,11 +31,3 @@ export default function QRReader(props: QrReaderProps) {
     </div>
   );
 }
-
-{
-  /* <QrReader
-constraints={{ facingMode: "environment" }}
-onResult={props.onResult}
-videoId="qr-reader"
-/> */
-}

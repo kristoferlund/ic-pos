@@ -3,7 +3,7 @@ import { Principal } from "@dfinity/principal";
 import React from "react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
-export default function useIndexCanister() {
+export default function useCkBtcIndex() {
   const { identity, agent } = useAuth();
   const [indexCanister, setIndexCanister] = React.useState<
     IcrcIndexCanister | undefined

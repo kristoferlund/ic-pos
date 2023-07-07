@@ -1,31 +1,17 @@
+// Importing required modules
 import { SerializableParam, selectorFamily } from "recoil";
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 
 import toast from "react-hot-toast";
 
+// Interface for API error response data
 export interface ApiErrorResponseData {
   errors?: Array<string>;
   message: string;
   name: string;
 }
 
-export const isResponseOk = <T>(
-  response: AxiosResponse<T> | AxiosError | null | unknown
-): response is AxiosResponse<T> => {
-  const axiosResponse = response as AxiosResponse;
-  if (!axiosResponse) return false;
-  return axiosResponse.status === 200 || axiosResponse.status === 201;
-};
-
-export const isApiResponseAxiosError = (
-  axiosResponse: AxiosResponse | AxiosError | null | unknown
-): axiosResponse is AxiosError<ApiErrorResponseData> => {
-  return (
-    axiosResponse !== null &&
-    (axiosResponse as AxiosError).isAxiosError !== undefined
-  );
-};
-
+// Type for request parameters
 export type RequestParams = {
   [key: string]: SerializableParam;
   url: string;
@@ -38,17 +24,30 @@ export type RequestParams = {
   handleErrorsAutomatically?: boolean;
 };
 
-/**
- * Handle error responses (excluding initial 401 response). Any HTTP Code which is not 2xx will be considered as error
- *
- * @param err
- */
+// Function to check if the response is OK
+export const isResponseOk = <T>(
+  response: AxiosResponse<T> | AxiosError | null | unknown
+): response is AxiosResponse<T> => {
+  const axiosResponse = response as AxiosResponse;
+  if (!axiosResponse) return false;
+  return axiosResponse.status === 200 || axiosResponse.status === 201;
+};
+
+// Function to check if the API response is an Axios error
+export const isApiResponseAxiosError = (
+  axiosResponse: AxiosResponse | AxiosError | null | unknown
+): axiosResponse is AxiosError<ApiErrorResponseData> => {
+  return (
+    axiosResponse !== null &&
+    (axiosResponse as AxiosError).isAxiosError !== undefined
+  );
+};
+
+// Function to handle errors
 export const handleErrors = (
   err: AxiosError,
   handleErrorsAutomatically = true
 ): AxiosError => {
-  // Handling errors automatically means the error will be displayed to the user with a toast.
-  // If not handled automatically, the error will just be logged to the console and returned.
   if (handleErrorsAutomatically) {
     toast.error(err.message);
   }
@@ -56,11 +55,7 @@ export const handleErrors = (
   return err;
 };
 
-/**
- * Api client for unathenticated requests
- *
- * @returns
- */
+// Function to create an API client for unauthenticated requests
 export const makeApiClient = (
   handleErrorsAutomatically = true
 ): AxiosInstance => {
@@ -76,6 +71,7 @@ export const makeApiClient = (
   return apiClient;
 };
 
+// Selector family for API GET requests
 export const ApiGet = selectorFamily({
   key: "ApiGet",
   get:

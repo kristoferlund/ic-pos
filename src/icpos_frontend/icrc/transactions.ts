@@ -23,7 +23,7 @@ export const Transactions = selectorFamily<Transaction[], TransactionsParams>({
       const response = get(
         ApiGet<TransactionResponse>({
           url: `/ledgers/${
-            import.meta.env.VITE_CANISTER_ID_ICRC
+            import.meta.env.VITE_CANISTER_ID_CKBTC_LEDGER
           }/accounts/${id}/transactions?limit=${limit}`,
         })
       );
@@ -40,7 +40,7 @@ export const fetchTransactions = async (id: string, limit = 0) => {
   });
   return apiClient.get<TransactionResponse>(
     `/ledgers/${
-      import.meta.env.VITE_CANISTER_ID_ICRC
+      import.meta.env.VITE_CANISTER_ID_CKBTC_LEDGER
     }/accounts/${id}/transactions?limit=${limit}`
   );
 };

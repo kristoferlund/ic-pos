@@ -1,25 +1,13 @@
-import {
-  Merchant,
-  _SERVICE,
-} from "../../../../declarations/icpos_backend/icpos_backend.did";
-import { atom, useRecoilState } from "recoil";
+import { Merchant, _SERVICE } from "../../../../declarations/icpos/icpos.did";
 
 import { ActorSubclass } from "@dfinity/agent";
+import { MerchantState } from "../state/merchant.state";
 import React from "react";
-import { createActor } from "../../../../declarations/icpos_backend";
+import { createActor } from "../../../../declarations/icpos";
 import { useAuth } from "../../../auth/hooks/useAuth";
+import { useRecoilState } from "recoil";
 
-type MerchantStateType = {
-  initialized: boolean;
-  merchant: Merchant | undefined;
-};
-
-const MerchantState = atom<MerchantStateType>({
-  key: "MerchantState",
-  default: { initialized: false, merchant: undefined },
-});
-
-export function useIcPosBackend() {
+export function useIcPos() {
   const { isAuthenticated, authClient, hasLoggedIn, identity, agent } =
     useAuth();
   const [backend, setBackend] = React.useState<ActorSubclass<_SERVICE> | null>(
@@ -29,7 +17,7 @@ export function useIcPosBackend() {
 
   React.useEffect(() => {
     if (!isAuthenticated || !authClient || !hasLoggedIn || !agent) return;
-    const actor = createActor(import.meta.env.VITE_CANISTER_ID_ICPOS_BACKEND, {
+    const actor = createActor(import.meta.env.VITE_CANISTER_ID_ICPOS, {
       agent,
     });
     setBackend(actor);

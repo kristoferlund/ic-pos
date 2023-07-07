@@ -1,66 +1,103 @@
-# Ez-POS
+![](./media/header.png)
 
-Setup a simple store front to accept ckBTC payments on the Internet Computer.
+# IC-POS
 
----
+The Internet Computer [integrates directly with the Bitcoin network](https://internetcomputer.org/docs/current/developer-docs/integrations/bitcoin/). This allows canisters on the Internet Computer to receive, hold, and send Bitcoin, all directly with transactions on the Bitcoin network. Chain-key Bitcoin (ckBTC) is an ICRC-1-compliant token that is backed 1:1 by Bitcoin held 100% on the IC mainnet. IC-POS is an experimental app to demonstrate a real world use case for ckBTC on the Internet Computer. It is a simple Point of Sale app that allows users to accept ckBTC payments.
 
-Welcome to your new icpos project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+For deeper understanding of the ICP < > BTC integration, see the IC wiki article on [Bitcoin integration](https://wiki.internetcomputer.org/wiki/Bitcoin_Integration).
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+## Features
 
-To learn more before you start working with icpos, see the following documentation available online:
+- Users can login with their Internet Identity and configure a store.
+- Display a QR code for customers to scan and pay. When a payment is received, the app will display a confirmation message.
+- Payment notificactions as email/sms even when the app is not open. This uses the [HTTP Outcall](https://internetcomputer.org/docs/current/developer-docs/integrations/https-outcalls/) feature of the Internet Computer.
+- Send ckBTC to other users.
 
-- [Quick Start](https://internetcomputer.org/docs/quickstart/quickstart-intro)
-- [SDK Developer Tools](https://internetcomputer.org/docs/developers-guide/sdk-guide)
-- [Rust Canister Devlopment Guide](https://internetcomputer.org/docs/rust-guide/rust-intro)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/candid-guide/candid-intro)
-- [JavaScript API Reference](https://erxue-5aaaa-aaaab-qaagq-cai.raw.icp0.io)
+## Try it!
 
-If you want to start working on your project right away, you might want to try the following commands:
+EzPOS is deployed on the Internet Computer. You can try it out here:
 
-```bash
-cd icpos/
-dfx help
-dfx canister --help
+https://hngac-6aaaa-aaaal-qb6tq-cai.icp0.io/
+
+## Architecture
+
+### Backend
+
+The backend is written in Motoko and consist of one canister, `icpos`. It exposes two public methods:
+
+- `get` - returns the store configuration for a given principal.
+- `update` - updates the store configuration for a given principal.
+
+In addition to the public methods, the canister uses a [timer](https://internetcomputer.org/docs/current/motoko/main/timers/) to monitor ledger transactions. When a new transaction is found that matches a configured store – depending on the store settings – the canister will send a notification either by email or SMS.
+
+### Frontend
+
+The frontend is written in Typescript/Vite/React/TailwindCSS. Users authenticate using the Internet Identity to access their store. The first time a user logs in, a store is created for them.
+
+The frontend interacts with the following IC canisters:
+
+- `icpos` - to fetch and update store configuration.
+- `ckbtc ledger` - to send ckBTC to other users.
+- `internet identity` - to authenticate users.
+
+## Prerequisites
+
+- [x] Install the [IC SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install/index.mdx).
+
+### Step 1: Start a local instance of the Internet Computer
+
 ```
-
-## Running the project locally
-
-If you want to test your project locally, you can use the following commands:
-
-```bash
-# Starts the replica, running in the background
 dfx start --background
-
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+### Step 2: Deploy the backend canister:
 
-If you have made changes to your backend canister, you can generate a new candid interface with
-
-```bash
-npm run generate
+```
+dfx deploy icpos --argument '(0)'
 ```
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+The `--argument '(0)'` argument is used to initialize the canister with `startBlock` set to 0. This is used to tell the canister to start monitoring the ledger from block 0. When deploying to the IC mainnet, this should be set to the current block height to prevent the canister from processing old transactions.
 
-If you are making frontend changes, you can start a development server with
+### Step 3: Build and run the frontend
 
-```bash
-npm start
+```
+yarn
+yarn dev
 ```
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+The frontend is best run locally using yarn. Accessing the frontend through the local canister does not work at the moment due to lazy loading of modules. When deploying to ic mainnet this is not an issue.
 
-### Note on frontend environment variables
+## Not yet implemented
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+- **Email notifications and SMS notifications are not yet sent.** The logic needed to monitor the ledger canister for new transactions is implemented but the http outcalls are not yet completed due to time constraints. Will be added the week 17-21/07.
 
-- set`DFX_NETWORK` to `production` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+## Notes
+
+- Make sure you update the frontend environment variables in `src/.env` to match your local setup. Also update `vite.config.ts` to set the frontend canister id.
+- Transactions are currently being fetched from the ICRC API. This is not ideal as there is some lag between the sending of a transaction and it being acknowledged by the API. We should instead be fetching them from the ckBTC canisters. This can be done for logged in users only as an autenticated `Agent` is required to interact with the canisters. I did create a hook to interact with the ledger canister directly, see `useCkBtcLedger.tsx`.
+- I included the generated files in `src/declarations` to highlight the changes I made to the generated code. Vite does not support `process.env` so I had to manually replace it with `import.meta.env`.
+
+## Possible Improvements
+
+- Use `useCkBtcLedger` hook to fetch transactions instead of the ICRC API for logged in users.
+- Login state is not persisted. Reloading the app will log the user out. This should be done using `localStorage` or `sessionStorage`.
+- Show more information about transactions. A transaction detail page.
+- Show a confirmation dialog after user clicks on `Send` button.
+
+## Known issues
+
+- Payment confirmations can be slow at times.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## Author
+
+- [kristofer@fmckl.se](mailto:kristofer@fmckl.se)
+- Twitter: [@kristoferlund](https://twitter.com/kristoferlund)
+- Discord: kristofer#1475
+
+## License
+
+[MIT](LICENSE)

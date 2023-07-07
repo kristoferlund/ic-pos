@@ -5,10 +5,10 @@ import LoginButton from "./components/LoginButton";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
 import { ReactNode } from "react";
-import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
+import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
 export default function StartPage(): ReactNode {
-  const { merchantState } = useIcPosBackend();
+  const { merchantState } = useIcPos();
 
   // If the merchant state is initialized it means that the backend actor is available
   if (merchantState.initialized) {
@@ -27,7 +27,7 @@ export default function StartPage(): ReactNode {
           <div className="flex items-center justify-center w-full p-10">
             <CkBTC />
           </div>
-          <div className="text-4xl font-bold">Ez-POS </div>
+          <div className="text-4xl font-bold">IC-POS </div>
           <div>
             Setup a simple store front to accept ckBTC payments on the Internet
             Computer. Sign in with Internet Identity to get started or{" "}

@@ -1,25 +1,25 @@
+import { Link, Navigate } from "@tanstack/router";
 import { QrCode, X } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
-import { Link, Navigate } from "@tanstack/router";
+import Loading from "../../components/Loading";
 import Main from "../../components/Main";
 import Page from "../../components/Page";
-import { useAuth } from "../../auth/hooks/useAuth";
-import Loading from "../../components/Loading";
-import { formatCkBtc } from "../../utils/formatCkBtc";
 import PrincipalPill from "../../components/PrincipalPill";
-import SendForm from "./components/SendForm";
-import useLedgerCanister from "../../canisters/ledger/hooks/useLedgerCanister";
+import QRReader from "../../components/QRReader";
 import React from "react";
 import { Result } from "react-zxing";
-import QRReader from "../../components/QRReader";
-import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
+import SendForm from "./components/SendForm";
+import { formatCkBtc } from "../../utils/formatCkBtc";
+import { useAuth } from "../../auth/hooks/useAuth";
+import useCkBtcLedger from "../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
+import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
 export default function SendPage() {
-  const { merchantState } = useIcPosBackend();
+  const { merchantState } = useIcPos();
   const { identity, hasLoggedIn } = useAuth();
-  const { balance } = useLedgerCanister();
+  const { balance } = useCkBtcLedger();
 
   const [qrReaderOpen, setQrReaderOpen] = React.useState(false);
   const [principal, setPrincipal] = React.useState("");

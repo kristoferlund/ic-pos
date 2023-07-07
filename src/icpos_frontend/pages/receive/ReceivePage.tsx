@@ -1,5 +1,3 @@
-import { X } from "lucide-react";
-
 import { Button } from "../../components/ui/button";
 import Header from "../../components/Header";
 import HistoryButton from "../../components/HistoryButton";
@@ -10,11 +8,12 @@ import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import { QRCodeSVG } from "qrcode.react";
 import TransactionOverlay from "./components/TransactionOverlay";
+import { X } from "lucide-react";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { useIcPosBackend } from "../../canisters/ic-pos-backend/hooks/useBackend";
+import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
 export default function ReceivePage() {
-  const { merchantState } = useIcPosBackend();
+  const { merchantState } = useIcPos();
   const { identity } = useAuth();
   const search = window.location.search;
   const params = new URLSearchParams(search);

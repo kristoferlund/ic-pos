@@ -16,10 +16,10 @@ import React from "react";
 import { Switch } from "../../../components/ui/switch";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { useIcPos } from "../../../canisters/ic-pos/hooks/useIcPos";
+import { useNavigate } from "@tanstack/router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "@tanstack/router";
-import { useIcPosBackend } from "../../../canisters/ic-pos-backend/hooks/useBackend";
 
 const MerchantSchema = z.object({
   name: z.string().min(2, {
@@ -34,7 +34,7 @@ const MerchantSchema = z.object({
 type MerchantSchemaType = z.infer<typeof MerchantSchema>;
 
 export default function ConfigForm() {
-  const { merchantState, updateMerchant } = useIcPosBackend();
+  const { merchantState, updateMerchant } = useIcPos();
   const navigate = useNavigate();
 
   const form = useForm<MerchantSchemaType>({
