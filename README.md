@@ -19,6 +19,8 @@ EzPOS is deployed on the Internet Computer. You can try it out here:
 
 https://hngac-6aaaa-aaaal-qb6tq-cai.icp0.io/
 
+https://github.com/kristoferlund/ic-pos/assets/9698363/f67d9952-3ee1-4876-a5e5-6ed0e29bae9d
+
 ## Architecture
 
 ### Backend
