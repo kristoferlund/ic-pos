@@ -70,6 +70,7 @@ The frontend is best run locally using yarn. Accessing the frontend through the 
 ## Not yet implemented
 
 - **Email notifications and SMS notifications are not yet sent.** The logic needed to monitor the ledger canister for new transactions is implemented but the http outcalls are not yet completed due to time constraints. Will be added the week 17-21/07.
+- **Sound notifications**. Forgot about that. Will be added the week 17-21/07.
 
 ## Notes
 
