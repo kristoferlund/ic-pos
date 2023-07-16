@@ -28,9 +28,9 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   private stable var courierApiKey : Text = "";
 
   // Local deployment of an ICRC ledger
-  private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
+  //private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
   // ckBTC ICRC ledger on the Internet Computer
-  //private var LedgerActor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
+  private var LedgerActor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
 
   /**
     *  Get the merchant's information
@@ -131,16 +131,15 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     });
 
     let t = response.transactions[0];
-    if (t.kind == "mint") {
-      switch (t.mint) {
-        case (?mint) {
-          let to = mint.to.owner;
+    if (t.kind == "transfer") {
+      switch (t.transfer) {
+        case (?transfer) {
+          let to = transfer.to.owner;
           switch (Trie.get(merchantStore, merchantKey(Principal.toText(to)), Text.equal)) {
             case (?merchant) {
               if (merchant.email_notifications) {
                 Debug.print("Sending email to: " # debug_show (merchant.email_address));
                 await sendEmail(merchant, t);
-                Debug.print("Email sent.");
               };
               if (merchant.phone_notifications) {
                 Debug.print("Sending text to: " # debug_show (merchant.phone_number));
@@ -189,14 +188,14 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
       case null {};
     };
 
-    let requestBodyJson : Text = "{\"message\": {\"to\": { \"email\": \"" # merchant.email_address # "\"},\"content\":{\"title\": \"You have received a payment\",\"body\": \"You have received a payment of " # amount # " from " # from # "\"}}}";
+    let requestBodyJson : Text = "{\"message\": {\"to\": { \"email\": \"" # merchant.email_address # "\"}, \"template\": \"WJKFSV1362MGZEHW9G7EMMPZDMMW\", \"data\": {\"amount\": \"" # amount # "\", \"payer\": \"" # from # "\"}}}";
     let requestBodyAsBlob : Blob = Text.encodeUtf8(requestBodyJson);
     let requestBodyAsNat8 : [Nat8] = Blob.toArray(requestBodyAsBlob);
 
     // 2.3 The HTTP request
     let httpRequest : HttpTypes.HttpRequestArgs = {
       url = "https://api.courier.com/send";
-      //url = "https://eoq1zgfdo8yw33s.m.pipedream.net";
+      // url = "https://eoq1zgfdo8yw33s.m.pipedream.net";
       max_response_bytes = null;
       headers = requestHeaders;
       body = ?requestBodyAsNat8;
@@ -205,20 +204,12 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     };
 
     //3. ADD CYCLES TO PAY FOR HTTP REQUEST
-    Cycles.add(220_131_200_000); //minimum cycles needed to pass the CI tests. Cycles needed will vary on many things size of http response, subnetc, etc...).
+    Cycles.add(300_000_000_000);
 
     //4. MAKE HTTPS REQUEST AND WAIT FOR RESPONSE
     let httpResponse : HttpTypes.HttpResponsePayload = await ic.http_request(httpRequest);
 
-    //5. DECODE THE RESPONSE
-    // let responseBody : Blob = Blob.fromArray(httpResponse.body);
-    // let decodedText : Text = switch (Text.decodeUtf8(responseBody)) {
-    //   case (null) { "No value returned" };
-    //   case (?y) { y };
-    // };
-    // Debug.print("Response body: " # decodedText);
-
-    if (httpResponse.status != 200) {
+    if (httpResponse.status > 299) {
       Debug.print("Error sending email");
     } else {
       Debug.print("Email sent");

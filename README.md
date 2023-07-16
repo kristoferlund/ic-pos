@@ -58,7 +58,15 @@ dfx deploy icpos --argument '(0)'
 
 The `--argument '(0)'` argument is used to initialize the canister with `startBlock` set to 0. This is used to tell the canister to start monitoring the ledger from block 0. When deploying to the IC mainnet, this should be set to the current block height to prevent the canister from processing old transactions.
 
-### Step 3: Build and run the frontend
+### Step 3: Set Courier credentials
+
+IC-POS uses [Courier](https://courier.com/) to send email and SMS notifications. You need to configure your Courier credentials in the `icpos` canister. You can do this by running the following command:
+
+```
+dfx canister --network local call icpos setCourierApiKey "pk_prod_..."
+```
+
+### Step 4: Build and run the frontend
 
 ```
 yarn
