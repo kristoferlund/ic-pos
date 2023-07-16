@@ -2814,18 +2814,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:^0.6.2":
-  version: 0.6.3
-  resolution: "iconv-lite@npm:0.6.3"
-  dependencies:
-    safer-buffer: ">= 2.1.2 < 3.0.0"
-  checksum: 3f60d47a5c8fc3313317edfd29a00a692cc87a19cac0159e2ce711d0ebc9019064108323b5e493625e25594f11c6236647d8e256fbe7a58f4a3b33b89e6d30bf
-  languageName: node
-  linkType: hard
-
-"icpos_frontend@workspace:.":
+"ic-pos@workspace:.":
   version: 0.0.0-use.local
-  resolution: "icpos_frontend@workspace:."
+  resolution: "ic-pos@workspace:."
   dependencies:
     "@dfinity/agent": ^0.16.0
     "@dfinity/auth-client": ^0.16.0
@@ -2875,6 +2866,15 @@ __metadata:
     zod: ^3.21.4
   languageName: unknown
   linkType: soft
+
+"iconv-lite@npm:^0.6.2":
+  version: 0.6.3
+  resolution: "iconv-lite@npm:0.6.3"
+  dependencies:
+    safer-buffer: ">= 2.1.2 < 3.0.0"
+  checksum: 3f60d47a5c8fc3313317edfd29a00a692cc87a19cac0159e2ce711d0ebc9019064108323b5e493625e25594f11c6236647d8e256fbe7a58f4a3b33b89e6d30bf
+  languageName: node
+  linkType: hard
 
 "idb@npm:^7.0.2":
   version: 7.1.1
