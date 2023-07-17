@@ -1,8 +1,7 @@
-import { Github, GithubIcon } from "lucide-react";
-import { Link, RouterProvider } from "@tanstack/router";
-
 import FullpageLoading from "./components/FullpageLoading";
+import { GithubIcon } from "lucide-react";
 import React from "react";
+import { RouterProvider } from "@tanstack/router";
 import { Toaster } from "react-hot-toast";
 import { router } from "./router";
 

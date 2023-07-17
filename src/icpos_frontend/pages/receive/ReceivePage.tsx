@@ -1,9 +1,8 @@
-import { Link, Navigate } from "@tanstack/router";
-
 import { Button } from "../../components/ui/button";
 import FullpageLoading from "../../components/FullpageLoading";
 import HeaderSection from "../../components/HeaderSection";
 import HistoryButton from "../../components/HistoryButton";
+import { Link } from "@tanstack/router";
 import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
@@ -15,14 +14,9 @@ import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
 export default function ReceivePage() {
   const { merchantState } = useIcPos();
-  const { identity, hasLoggedIn } = useAuth();
+  const { identity } = useAuth();
   const search = window.location.search;
   const params = new URLSearchParams(search);
-
-  // This page requires authentication
-  if (!hasLoggedIn) {
-    return <Navigate to="/" />;
-  }
 
   if (!params.has("principal")) {
     if (!merchantState || !merchantState.merchant || !identity)
