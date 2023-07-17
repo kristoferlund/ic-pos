@@ -10,7 +10,7 @@ import { useRecoilState } from "recoil";
 export function useIcPos() {
   const { isAuthenticated, authClient, hasLoggedIn, identity, agent } =
     useAuth();
-  const [backend, setBackend] = React.useState<ActorSubclass<_SERVICE> | null>(
+  const [icPos, setIcPos] = React.useState<ActorSubclass<_SERVICE> | null>(
     null
   );
   const [merchantState, setMerchantState] = useRecoilState(MerchantState);
@@ -20,12 +20,12 @@ export function useIcPos() {
     const actor = createActor(import.meta.env.VITE_CANISTER_ID_ICPOS, {
       agent,
     });
-    setBackend(actor);
+    setIcPos(actor);
   }, [isAuthenticated, authClient, hasLoggedIn, identity, agent]);
 
   React.useEffect(() => {
-    if (!backend) return;
-    backend.getMerchant().then((response) => {
+    if (!icPos) return;
+    icPos.getMerchant().then((response) => {
       if (response.status === 200) {
         if (!response.data) return;
         setMerchantState({
@@ -39,11 +39,11 @@ export function useIcPos() {
         merchant: undefined,
       });
     });
-  }, [backend, setMerchantState]);
+  }, [icPos, setMerchantState]);
 
   const updateMerchant = async (merchant: Merchant) => {
-    if (!backend) return;
-    const response = await backend.updateMerchant(merchant);
+    if (!icPos) return;
+    const response = await icPos.updateMerchant(merchant);
     if (response.status === 200) {
       if (!response.data) return;
       setMerchantState({

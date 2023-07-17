@@ -30,9 +30,9 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   private var logData = Buffer.Buffer<Text>(0);
 
   // Local deployment of an ICRC ledger
-  private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
+  //private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
   // ckBTC ICRC ledger on the Internet Computer
-  // private var LedgerActor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
+  private var LedgerActor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
 
   /**
     *  Get the merchant's information

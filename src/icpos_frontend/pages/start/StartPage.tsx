@@ -10,7 +10,7 @@ import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 export default function StartPage(): ReactNode {
   const { merchantState } = useIcPos();
 
-  // If the merchant state is initialized it means that the backend actor is available
+  // If the merchant state is initialized it means that the backend icpos actor is available
   if (merchantState.initialized) {
     // If the merchant is initialized, navigate to the merchant page
     if (merchantState.merchant) {

@@ -39,6 +39,6 @@ export const createActor = (canisterId, options = {}) => {
   });
 };
 
-export const icpos_backend = createActor(canisterId, {
+export const icpos = createActor(canisterId, {
   agentOptions: { host: import.meta.env.VITE_IC_HOST },
 });

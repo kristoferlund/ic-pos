@@ -52,7 +52,7 @@ The frontend interacts with the following IC canisters:
 dfx start --background
 ```
 
-### Step 2: Deploy the backend canister:
+### Step 2: Deploy the icpos canister:
 
 ```
 dfx deploy icpos --argument '(0)'
