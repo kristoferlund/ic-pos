@@ -15,6 +15,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Trie "mo:base/Trie";
 import TrieMap "mo:base/TrieMap";
+import Buffer "mo:base/Buffer";
 
 // Importing local modules
 import MainTypes "main.types";
@@ -26,6 +27,7 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   private stable var merchantStore : Trie.Trie<Text, MainTypes.Merchant> = Trie.empty();
   private stable var latestTransactionIndex : Nat = 0;
   private stable var courierApiKey : Text = "";
+  private var logData = Buffer.Buffer<Text>(0);
 
   // Local deployment of an ICRC ledger
   //private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
@@ -100,6 +102,27 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   };
 
   /**
+  * Get latest log items. Log output is capped at 100 items.
+  */
+  public query func getLogs() : async [Text] {
+    Buffer.toArray(logData);
+  };
+
+  /**
+    * Log a message. Log output is capped at 100 items.
+    */
+  private func log(text : Text) {
+    Debug.print(text);
+    logData.reserve(logData.size() + 1);
+    logData.insert(0, text);
+    // Cap the log at 100 items
+    if (logData.size() == 100) {
+      let x = logData.removeLast();
+    };
+    return;
+  };
+
+  /**
     * Generate a Trie key based on a merchant's principal ID
     */
   private func merchantKey(x : Text) : Trie.Key<Text> {
@@ -110,11 +133,16 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     * Check for new transactions and notify the merchant if a new transaction is found.
     * This function is called by the global timer.
     */
-  system func timer(setGlobalTimer : Nat64 -> ()) : async () {
-    let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
-    setGlobalTimer(next);
-    await notify();
-  };
+
+  // Background notifiations currently disabled as IC requires external https endpoints
+  // to support IPv6. This is not currently supported by Courier (or any other service
+  // I could find).
+
+  // system func timer(setGlobalTimer : Nat64 -> ()) : async () {
+  //   let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
+  //   setGlobalTimer(next);
+  //   await notify();
+  // };
 
   /**
     * Notify the merchant if a new transaction is found.
@@ -130,34 +158,36 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
       length = 1;
     });
 
-    let t = response.transactions[0];
-    if (t.kind == "transfer") {
-      switch (t.transfer) {
-        case (?transfer) {
-          let to = transfer.to.owner;
-          switch (Trie.get(merchantStore, merchantKey(Principal.toText(to)), Text.equal)) {
-            case (?merchant) {
-              if (merchant.email_notifications) {
-                Debug.print("Sending email to: " # debug_show (merchant.email_address));
-                await sendEmail(merchant, t);
+    if (Array.size(response.transactions) > 0) {
+      latestTransactionIndex := start;
+
+      if (response.transactions[0].kind == "transfer") {
+        let t = response.transactions[0];
+        switch (t.transfer) {
+          case (?transfer) {
+            let to = transfer.to.owner;
+            switch (Trie.get(merchantStore, merchantKey(Principal.toText(to)), Text.equal)) {
+              case (?merchant) {
+                if (merchant.email_notifications) {
+                  log("Sending email to: " # debug_show (merchant.email_address));
+                  await sendEmail(merchant, t);
+                };
+                if (merchant.phone_notifications) {
+                  log("Sending text to: " # debug_show (merchant.phone_number));
+                  //TODO: Implement HTTP outcall to send text
+                };
               };
-              if (merchant.phone_notifications) {
-                Debug.print("Sending text to: " # debug_show (merchant.phone_number));
-                //TODO: Implement HTTP outcall to send text
+              case null {
+                // No action required if merchant not found
               };
-            };
-            case null {
-              // No action required if merchant not found
             };
           };
-        };
-        case null {
-          // No action required if mint is null
+          case null {
+            // No action required if transfer is null
+          };
         };
       };
     };
-
-    latestTransactionIndex := start;
   };
 
   /**
@@ -195,8 +225,7 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     // 2.3 The HTTP request
     let httpRequest : HttpTypes.HttpRequestArgs = {
       url = "https://api.courier.com/send";
-      // url = "https://eoq1zgfdo8yw33s.m.pipedream.net";
-      max_response_bytes = null;
+      max_response_bytes = ?Nat64.fromNat(1000);
       headers = requestHeaders;
       body = ?requestBodyAsNat8;
       method = #post;
@@ -204,15 +233,22 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     };
 
     //3. ADD CYCLES TO PAY FOR HTTP REQUEST
-    Cycles.add(300_000_000_000);
+    // 49.14M + 5200 * request_size + 10400 * max_response_bytes
+    // 49.14M + (5200 * 1000) + (10400 * 1000) = 64.74M
+    Cycles.add(70_000_000);
 
     //4. MAKE HTTPS REQUEST AND WAIT FOR RESPONSE
     let httpResponse : HttpTypes.HttpResponsePayload = await ic.http_request(httpRequest);
 
     if (httpResponse.status > 299) {
-      Debug.print("Error sending email");
+      log("Error sending email");
     } else {
-      Debug.print("Email sent");
+      log("Email sent");
     };
+  };
+
+  system func postupgrade() {
+    // Make sure we start to montitor transactions from the block set on deployment
+    latestTransactionIndex := _startBlock;
   };
 };
