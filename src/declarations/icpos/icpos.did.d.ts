@@ -1,21 +1,23 @@
-import type { Principal } from "@dfinity/principal";
 import type { ActorMethod } from "@dfinity/agent";
 
 export interface Merchant {
-  email_address: string;
-  phone_notifications: boolean;
   name: string;
   email_notifications: boolean;
+  email_address: string;
+  phone_notifications: boolean;
   phone_number: string;
 }
-export type Principal = Uint8Array | number[];
-export interface Response {
+
+export interface Response<T> {
   status: number;
-  data: [] | [Merchant];
   status_text: string;
-  error_text: [] | [string];
+  data: T | null;
+  error_text: string | null;
 }
+
 export interface _SERVICE {
-  get: ActorMethod<[], Response>;
-  update: ActorMethod<[Merchant], Response>;
+  getMerchant: ActorMethod<[], Response<[Merchant]>>;
+  updateMerchant: ActorMethod<[Merchant], Response<[Merchant]>>;
+  setCourierApiKey: ActorMethod<[string], string>;
+  getLogs: ActorMethod<[], string[]>;
 }

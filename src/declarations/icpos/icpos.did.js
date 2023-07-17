@@ -6,15 +6,22 @@ export const idlFactory = ({ IDL }) => {
     email_notifications: IDL.Bool,
     phone_number: IDL.Text,
   });
-  const Response = IDL.Record({
+  const ResponseMerchant = IDL.Record({
     status: IDL.Nat16,
     data: IDL.Opt(Merchant),
     status_text: IDL.Text,
     error_text: IDL.Opt(IDL.Text),
   });
+  const ResponseText = IDL.Record({
+    status: IDL.Nat16,
+    data: IDL.Opt(IDL.Text),
+    status_text: IDL.Text,
+    error_text: IDL.Opt(IDL.Text),
+  });
   return IDL.Service({
-    get: IDL.Func([], [Response], ["query"]),
-    update: IDL.Func([Merchant], [Response], []),
+    getMerchant: IDL.Func([], [ResponseMerchant], ["query"]),
+    updateMerchant: IDL.Func([Merchant], [ResponseMerchant], []),
+    setCourierApiKey: IDL.Func([IDL.Text], [ResponseText], []),
   });
 };
 export const init = ({ IDL }) => {

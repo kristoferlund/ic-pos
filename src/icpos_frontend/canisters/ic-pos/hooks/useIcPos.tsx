@@ -25,8 +25,9 @@ export function useIcPos() {
 
   React.useEffect(() => {
     if (!backend) return;
-    backend.get().then((response) => {
+    backend.getMerchant().then((response) => {
       if (response.status === 200) {
+        if (!response.data) return;
         setMerchantState({
           initialized: true,
           merchant: response.data[0],
@@ -42,8 +43,9 @@ export function useIcPos() {
 
   const updateMerchant = async (merchant: Merchant) => {
     if (!backend) return;
-    const response = await backend.update(merchant);
+    const response = await backend.updateMerchant(merchant);
     if (response.status === 200) {
+      if (!response.data) return;
       setMerchantState({
         initialized: true,
         merchant: response.data[0],
