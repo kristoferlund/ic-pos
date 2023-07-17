@@ -2,10 +2,10 @@ import { Cog, LogOut } from "lucide-react";
 import { Link, Navigate } from "@tanstack/router";
 
 import { Button } from "../../components/ui/button";
-import Header from "../../components/Header";
+import FullpageLoading from "../../components/FullpageLoading";
+import HeaderSection from "../../components/HeaderSection";
 import HistoryButton from "../../components/HistoryButton";
-import Loading from "../../components/Loading";
-import Main from "../../components/Main";
+import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import ReceiveButton from "./components/ReceiveButton";
@@ -26,11 +26,11 @@ export default function MerchantPage() {
   }
 
   if (!merchantState || !merchantState.merchant || !identity)
-    return <Loading />;
+    return <FullpageLoading />;
 
   return (
     <Page>
-      <Header>
+      <HeaderSection>
         <Link to="/">
           <Button variant="ghost" size="icon">
             <LogOut
@@ -48,8 +48,8 @@ export default function MerchantPage() {
             <Cog className="w-4 h-4" />
           </Button>
         </Link>
-      </Header>
-      <Main>
+      </HeaderSection>
+      <MainSection>
         <div className="flex flex-col items-center justify-between pb-10 space-y-5 grow">
           <div className="grow" />
           <div>{formatCkBtc(balance)} ckBTC</div>
@@ -61,7 +61,7 @@ export default function MerchantPage() {
             <HistoryButton principal={identity?.getPrincipal().toString()} />
           </div>
         </div>
-      </Main>
+      </MainSection>
     </Page>
   );
 }

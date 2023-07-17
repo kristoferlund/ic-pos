@@ -1,17 +1,17 @@
 import { Button } from "../../components/ui/button";
-import Header from "../../components/Header";
+import FullpageLoading from "../../components/FullpageLoading";
+import HeaderSection from "../../components/HeaderSection";
 import { Link } from "@tanstack/router";
-import Loading from "../../components/Loading";
-import Main from "../../components/Main";
+import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 import TransactionRow from "./components/TransactionRow";
+import { Transactions } from "../../icrc/transactions";
 import { X } from "lucide-react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useRecoilValue } from "recoil";
-import { Transactions } from "../../icrc/transactions";
 
 export default function HistoryPage() {
-  const { identity } = useAuth();
+  const { identity, hasLoggedIn } = useAuth();
   const search = window.location.search;
   const params = new URLSearchParams(search);
 
@@ -22,14 +22,14 @@ export default function HistoryPage() {
     Transactions({ id: principal, limit: 7 })
   );
 
-  if (!transactions) return <Loading />;
+  if (!transactions) return <FullpageLoading />;
 
   return (
     <Page>
-      <Header>
+      <HeaderSection>
         <Link
-          to={params.has("principal") ? "/receive" : "/merchant"}
-          search={params.has("principal") ? { principal } : undefined}
+          to={hasLoggedIn ? "/merchant" : "/receive"}
+          search={{ principal }}
         >
           <Button variant="ghost" size="icon">
             <X className="w-4 h-4" />
@@ -37,14 +37,14 @@ export default function HistoryPage() {
         </Link>
         History
         <div className="w-4 h-4" />
-      </Header>
-      <Main>
+      </HeaderSection>
+      <MainSection>
         <div className="flex flex-col items-center justify-top w-full grow md:h-[30px]">
           {transactions.map((transaction, index) => (
             <TransactionRow transaction={transaction} key={index} />
           ))}
         </div>
-      </Main>
+      </MainSection>
     </Page>
   );
 }

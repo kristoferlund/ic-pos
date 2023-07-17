@@ -1,14 +1,14 @@
 import { QrCode, X } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
-import Header from "../../components/Header";
+import HeaderSection from "../../components/HeaderSection";
 import { Link } from "@tanstack/router";
-import Main from "../../components/Main";
+import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
-import SelectPrincipalForm from "./components/SelectPrincipalForm";
-import React from "react";
 import QRReader from "../../components/QRReader";
+import React from "react";
 import { Result } from "react-zxing";
+import SelectPrincipalForm from "./components/SelectPrincipalForm";
 
 export default function ReceiveSelectPrincipalPage() {
   const [qrReaderOpen, setQrReaderOpen] = React.useState(false);
@@ -25,7 +25,7 @@ export default function ReceiveSelectPrincipalPage() {
 
   return (
     <Page>
-      <Header>
+      <HeaderSection>
         <Link to="/">
           <Button variant="ghost" size="icon">
             <X className="w-4 h-4" />
@@ -40,8 +40,8 @@ export default function ReceiveSelectPrincipalPage() {
         >
           <QrCode className="w-4 h-4" />
         </Button>
-      </Header>
-      <Main>
+      </HeaderSection>
+      <MainSection>
         <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
           <div>
             Montitor any ckBTC address for payments. You don't have to sign in
@@ -55,7 +55,7 @@ export default function ReceiveSelectPrincipalPage() {
           />
           {!qrReaderOpen && <SelectPrincipalForm principal={principal} />}
         </div>
-      </Main>
+      </MainSection>
     </Page>
   );
 }

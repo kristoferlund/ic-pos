@@ -2,9 +2,9 @@ import { Link, Navigate } from "@tanstack/router";
 import { QrCode, X } from "lucide-react";
 
 import { Button } from "../../components/ui/button";
-import Header from "../../components/Header";
-import Loading from "../../components/Loading";
-import Main from "../../components/Main";
+import FullpageLoading from "../../components/FullpageLoading";
+import HeaderSection from "../../components/HeaderSection";
+import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import QRReader from "../../components/QRReader";
@@ -39,11 +39,11 @@ export default function SendPage() {
   }
 
   if (!merchantState || !merchantState.merchant || !identity)
-    return <Loading />;
+    return <FullpageLoading />;
 
   return (
     <Page>
-      <Header>
+      <HeaderSection>
         <Link to="/merchant">
           <Button variant="ghost" size="icon">
             <X className="w-4 h-4" />
@@ -58,8 +58,8 @@ export default function SendPage() {
         >
           <QrCode className="w-4 h-4" />
         </Button>
-      </Header>
-      <Main>
+      </HeaderSection>
+      <MainSection>
         <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
           <div className="grow" />
           {!qrReaderOpen && (
@@ -76,7 +76,7 @@ export default function SendPage() {
             onResult={handleQrResult}
           />
         </div>
-      </Main>
+      </MainSection>
     </Page>
   );
 }

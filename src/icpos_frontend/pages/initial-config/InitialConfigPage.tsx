@@ -1,14 +1,14 @@
 import { Button } from "../../components/ui/button";
 import ConfigForm from "./components/ConfigForm";
-import Header from "../../components/Header";
+import HeaderSection from "../../components/HeaderSection";
 import { LogOut } from "lucide-react";
-import Main from "../../components/Main";
+import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 
 export default function InitialConfigPage() {
   return (
     <Page>
-      <Header>
+      <HeaderSection>
         <Button variant="ghost" size="icon">
           <LogOut
             className="w-4 h-4"
@@ -19,8 +19,8 @@ export default function InitialConfigPage() {
         </Button>
         <span>Configure Store</span>
         <div className="w-4 h-4" />
-      </Header>
-      <Main>
+      </HeaderSection>
+      <MainSection>
         <div className="flex flex-col items-center justify-between p-5 pb-10 space-y-5 grow">
           <div>
             Before you begin accepting payments, give your store a name!
@@ -28,7 +28,7 @@ export default function InitialConfigPage() {
           <div className="grow" />
           <ConfigForm />
         </div>
-      </Main>
+      </MainSection>
     </Page>
   );
 }
