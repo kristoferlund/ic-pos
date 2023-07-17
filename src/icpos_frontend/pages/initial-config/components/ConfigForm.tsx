@@ -57,7 +57,8 @@ export default function ConfigForm() {
       toast.success("Merchant settings updated.");
       navigate({ to: "/merchant" });
     } else {
-      toast.error(response?.error_text[0] || "An error occurred.");
+      response?.error_text &&
+        toast.error(response?.error_text[0] || "An error occurred.");
     }
   }
 
