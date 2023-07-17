@@ -25,10 +25,12 @@ https://github.com/kristoferlund/ic-pos/assets/9698363/f67d9952-3ee1-4876-a5e5-6
 
 ### Backend
 
-The backend is written in Motoko and consist of one canister, `icpos`. It exposes two public methods:
+The backend is written in Motoko and consist of one canister, `icpos`. It exposes four public methods:
 
-- `get` - returns the store configuration for a given principal.
-- `update` - updates the store configuration for a given principal.
+- `getMerchant` - returns the store configuration for a given principal.
+- `updateMerchant` - updates the store configuration for a given principal.
+- `getLogs` - The canister maintains a debug log that can be fetched using this method.
+- `setCourierApiKey` - sets the Courier API key used to send email and SMS notifications. Only the canister controller can call this method.
 
 In addition to the public methods, the canister uses a [timer](https://internetcomputer.org/docs/current/motoko/main/timers/) to monitor ledger transactions. When a new transaction is found that matches a configured store – depending on the store settings – the canister will send a notification either by email or SMS.
 
@@ -79,12 +81,12 @@ The frontend is best run locally using yarn. Accessing the frontend through the 
 
 ## Not yet implemented
 
-- **Email notifications and SMS notifications are not yet fully functional.** Notifications work well in a local setting but not when deployed to the IC mainnet. Some debugging remains to be done.
+- **Email notifications and SMS notifications are not yet fully functional.** Notifications work well in a local setting but not when deployed to the IC mainnet. This is due to the inability to call IPv4 addresses from the IC mainnet. As of writing, Courier does not support IPv6, nor have I found any other service that does.
 
 ## Notes
 
 - Make sure you update the frontend environment variables in `src/.env` to match your local setup. Also update `vite.config.ts` to set the frontend canister id.
-- Transactions are currently being fetched from the ICRC API. This is not ideal as there is some lag between the sending of a transaction and it being acknowledged by the API. We should instead be fetching them from the ckBTC canisters. This can be done for logged in users only as an autenticated `Agent` is required to interact with the canisters. I did create a hook to interact with the ledger canister directly, see `useCkBtcLedger.tsx`.
+- The ICRC ledger address is hardcoded in `src/icpos/main.mo`. Make sure you update this before deploying.
 - I included the generated files in `src/declarations` to highlight the changes I made to the generated code. Vite does not support `process.env` so I had to manually replace it with `import.meta.env`.
 
 ## Possible Improvements
@@ -96,7 +98,7 @@ The frontend is best run locally using yarn. Accessing the frontend through the 
 
 ## Known issues
 
-- Payment confirmations can be slow at times.
+- Background notifications not working. Awaiting IC IPv4 support.
 
 ## Contributing
 
@@ -106,7 +108,7 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 - [kristofer@fmckl.se](mailto:kristofer@fmckl.se)
 - Twitter: [@kristoferlund](https://twitter.com/kristoferlund)
-- Discord: kristofer#1475
+- Discord: kristoferkristofer
 
 ## License
 
