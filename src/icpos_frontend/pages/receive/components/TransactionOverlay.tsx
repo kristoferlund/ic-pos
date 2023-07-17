@@ -8,6 +8,7 @@ import { fetchTransactions } from "../../../icrc/transactions";
 import { formatCkBtc } from "../../../utils/formatCkBtc";
 import { isResponseOk } from "../../../axios/axios";
 import { useAuth } from "../../../auth/hooks/useAuth";
+import useSound from "use-sound";
 import { useState } from "react";
 
 export default function TransactionOverlay() {
@@ -72,10 +73,14 @@ export default function TransactionOverlay() {
     return () => clearInterval(interval);
   };
 
+  const [playSound] = useSound("/cash-register.mp3");
+
   // Only show if there is a received transaction
   if (!receivedTransaction) {
     return null;
   }
+
+  !close && playSound();
 
   return (
     <div className={classNames}>
