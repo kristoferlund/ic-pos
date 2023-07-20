@@ -22,6 +22,14 @@ import MainTypes "main.types";
 import CkBtcLedgerTypes "ckbtc-ledger/ckbtc-ledger.types";
 import HttpTypes "http/http.types";
 
+/**
+*  This actor is responsible for:
+*  - Storing merchant information
+*  - Monitoring the ledger for new transactions
+*  - Notifying merchants of new transactions
+*
+*  `_startBlock` is the block number to start monitoring transactions from.
+*/
 shared (actorContext) actor class Main(_startBlock : Nat) {
 
   private stable var merchantStore : Trie.Trie<Text, MainTypes.Merchant> = Trie.empty();
@@ -133,16 +141,11 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
     * Check for new transactions and notify the merchant if a new transaction is found.
     * This function is called by the global timer.
     */
-
-  // Background notifiations currently disabled as IC requires external https endpoints
-  // to support IPv6. This is not currently supported by Courier (or any other service
-  // I could find).
-
-  // system func timer(setGlobalTimer : Nat64 -> ()) : async () {
-  //   let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
-  //   setGlobalTimer(next);
-  //   await notify();
-  // };
+  system func timer(setGlobalTimer : Nat64 -> ()) : async () {
+    let next = Nat64.fromIntWrap(Time.now()) + 20_000_000_000; // 20 seconds
+    setGlobalTimer(next);
+    await notify();
+  };
 
   /**
     * Notify the merchant if a new transaction is found.
@@ -168,13 +171,9 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
             let to = transfer.to.owner;
             switch (Trie.get(merchantStore, merchantKey(Principal.toText(to)), Text.equal)) {
               case (?merchant) {
-                if (merchant.email_notifications) {
-                  log("Sending email to: " # debug_show (merchant.email_address));
-                  await sendEmail(merchant, t);
-                };
-                if (merchant.phone_notifications) {
-                  log("Sending text to: " # debug_show (merchant.phone_number));
-                  //TODO: Implement HTTP outcall to send text
+                if (merchant.email_notifications or merchant.phone_notifications) {
+                  log("Sending notification to: " # debug_show (merchant.email_address));
+                  await sendNotification(merchant, t);
                 };
               };
               case null {
@@ -191,23 +190,13 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   };
 
   /**
-    * Send an email to a merchant about a received payment
+    * Send a notification to a merchant about a received payment
     */
-  private func sendEmail(merchant : MainTypes.Merchant, transaction : CkBtcLedgerTypes.Transaction) : async () {
-    //1. DECLARE IC MANAGEMENT CANISTER
+  private func sendNotification(merchant : MainTypes.Merchant, transaction : CkBtcLedgerTypes.Transaction) : async () {
+    // Managment canister
     let ic : HttpTypes.IC = actor ("aaaaa-aa");
 
-    //2. SETUP ARGUMENTS FOR HTTP GET request
-    let idempotencyKey : Text = Text.concat(merchant.name, Nat64.toText(transaction.timestamp));
-    let requestHeaders = [
-      { name = "Content-Type"; value = "application/json" },
-      { name = "Idempotency-Key"; value = idempotencyKey },
-      {
-        name = "Authorization";
-        value = "Bearer " # courierApiKey;
-      },
-    ];
-
+    // Create request body
     var amount = "0";
     var from = "";
     switch (transaction.transfer) {
@@ -217,33 +206,41 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
       };
       case null {};
     };
-
-    let requestBodyJson : Text = "{\"message\": {\"to\": { \"email\": \"" # merchant.email_address # "\"}, \"template\": \"WJKFSV1362MGZEHW9G7EMMPZDMMW\", \"data\": {\"amount\": \"" # amount # "\", \"payer\": \"" # from # "\"}}}";
+    let idempotencyKey : Text = Text.concat(merchant.name, Nat64.toText(transaction.timestamp));
+    let requestBodyJson : Text = "{ \"idempotencyKey\": \"" # idempotencyKey # "\", \"email\": \"" # merchant.email_address # "\", \"phone\": \"" # merchant.phone_number # "\", \"amount\": \"" # amount # "\", \"payer\": \"" # from # "\"}";
     let requestBodyAsBlob : Blob = Text.encodeUtf8(requestBodyJson);
     let requestBodyAsNat8 : [Nat8] = Blob.toArray(requestBodyAsBlob);
 
-    // 2.3 The HTTP request
+    // Setup request
     let httpRequest : HttpTypes.HttpRequestArgs = {
-      url = "https://api.courier.com/send";
+      url = "https://icpos-notifications.xyz/.netlify/functions/notify";
       max_response_bytes = ?Nat64.fromNat(1000);
-      headers = requestHeaders;
+      headers = [
+        { name = "Content-Type"; value = "application/json" },
+      ];
       body = ?requestBodyAsNat8;
       method = #post;
       transform = null;
     };
 
-    //3. ADD CYCLES TO PAY FOR HTTP REQUEST
+    // Cycle cost of sending a notification
     // 49.14M + 5200 * request_size + 10400 * max_response_bytes
     // 49.14M + (5200 * 1000) + (10400 * 1000) = 64.74M
     Cycles.add(70_000_000);
 
-    //4. MAKE HTTPS REQUEST AND WAIT FOR RESPONSE
+    // Send the request
     let httpResponse : HttpTypes.HttpResponsePayload = await ic.http_request(httpRequest);
 
+    // Check the response
     if (httpResponse.status > 299) {
-      log("Error sending email");
+      let response_body : Blob = Blob.fromArray(httpResponse.body);
+      let decoded_text : Text = switch (Text.decodeUtf8(response_body)) {
+        case (null) { "No value returned" };
+        case (?y) { y };
+      };
+      log("Error sending notification: " # decoded_text);
     } else {
-      log("Email sent");
+      log("Notification sent");
     };
   };
 
