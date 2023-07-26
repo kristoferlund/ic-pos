@@ -8,7 +8,7 @@ import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import { QRCodeSVG } from "qrcode.react";
 import TransactionOverlay from "./components/TransactionOverlay";
-import { X } from "lucide-react";
+import { Printer, X } from "lucide-react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 
@@ -36,7 +36,14 @@ export default function ReceivePage() {
             </Button>
           </Link>
           Receive
-          <div className="w-8 h-8" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:text-black"
+            onClick={() => window.print()}
+          >
+            <Printer className="w-4 h-4" />
+          </Button>
         </HeaderSection>
         <TransactionOverlay />
         <MainSection>
@@ -47,7 +54,16 @@ export default function ReceivePage() {
               {!params.has("principal") && (
                 <div>{merchantState.merchant?.name}</div>
               )}
-              <PrincipalPill principal={principal} />
+              <PrincipalPill
+                principal={principal}
+                variant="short"
+                className="print:hidden"
+              />
+              <PrincipalPill
+                principal={principal}
+                variant="full"
+                className="hidden print:block"
+              />
             </div>
             <HistoryButton principal={principal} />
           </div>

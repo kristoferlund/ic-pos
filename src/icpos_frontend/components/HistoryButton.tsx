@@ -13,6 +13,7 @@ export default function HistoryButton({ principal }: HistoryButtonProps) {
       search={{
         principal,
       }}
+      className="print:hidden"
     >
       <Button size={"lg"} className="w-56">
         <Inbox className="w-4 h-4 mr-2" />
