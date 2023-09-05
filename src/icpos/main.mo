@@ -35,12 +35,8 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   private stable var merchantStore : Trie.Trie<Text, MainTypes.Merchant> = Trie.empty();
   private stable var latestTransactionIndex : Nat = 0;
   private stable var courierApiKey : Text = "";
+  private stable var ledgerActor : CkBtcLedgerTypes.Actor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
   private var logData = Buffer.Buffer<Text>(0);
-
-  // Local deployment of an ICRC ledger
-  //private var LedgerActor = actor ("b77ix-eeaaa-aaaaa-qaada-cai") : CkBtcLedgerTypes.Actor;
-  // ckBTC ICRC ledger on the Internet Computer
-  private var LedgerActor = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : CkBtcLedgerTypes.Actor;
 
   /**
     *  Get the merchant's information
@@ -91,7 +87,7 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
   /**
     * Set the courier API key. Only the owner can set the courier API key.
     */
-  public shared (context) func setCourierApiKey(newKey : Text) : async MainTypes.Response<Text> {
+  public shared (context) func setCourierApiKey(apiKey : Text) : async MainTypes.Response<Text> {
     if (not Principal.equal(context.caller, actorContext.caller)) {
       return {
         status = 403;
@@ -100,11 +96,32 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
         error_text = ?"Only the owner can set the courier API key.";
       };
     };
-    courierApiKey := newKey;
+    courierApiKey := apiKey;
     {
       status = 200;
       status_text = "OK";
       data = ?courierApiKey;
+      error_text = null;
+    };
+  };
+
+  /**
+    * Set the ledger principal, used when monitoring transactions. Only the owner can set the Ledger principal.
+    */
+  public shared (context) func setLedgerId(ledgerId : Text) : async MainTypes.Response<Text> {
+    if (not Principal.equal(context.caller, actorContext.caller)) {
+      return {
+        status = 403;
+        status_text = "Forbidden";
+        data = null;
+        error_text = ?"Only the owner can set the Ledger principal.";
+      };
+    };
+    ledgerActor := actor (ledgerId);
+    {
+      status = 200;
+      status_text = "OK";
+      data = ?ledgerId;
       error_text = null;
     };
   };
@@ -156,7 +173,7 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
       start := latestTransactionIndex + 1;
     };
 
-    var response = await LedgerActor.get_transactions({
+    var response = await ledgerActor.get_transactions({
       start = start;
       length = 1;
     });
