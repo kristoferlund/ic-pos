@@ -17,7 +17,7 @@ For deeper understanding of the ICP < > BTC integration, see the IC wiki article
 
 ## Try it!
 
-EzPOS is deployed on the Internet Computer. You can try it out here:
+IC-POS is deployed on the Internet Computer. You can try it out here:
 
 https://hngac-6aaaa-aaaal-qb6tq-cai.icp0.io/
 
