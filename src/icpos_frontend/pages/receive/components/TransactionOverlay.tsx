@@ -2,61 +2,70 @@ import { BadgeCheck, X } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import PrincipalPill from "../../../components/PrincipalPill";
-import React from "react";
-import { Transaction } from "../../../icrc/types/transaction.type";
-import { fetchTransactions } from "../../../icrc/transactions";
+import { Transfer } from "../../../canisters/icrc/types/transfer.type";
 import { formatCkBtc } from "../../../utils/formatCkBtc";
-import { isResponseOk } from "../../../axios/axios";
 import { useAuth } from "../../../auth/hooks/useAuth";
+import { useCkBtcLedgerAnon } from "../../../canisters/ckbtc-ledger/hooks/useCkBtcLedgerAnon";
+import { useEffect } from "react";
 import useSound from "use-sound";
 import { useState } from "react";
 
 export default function TransactionOverlay() {
-  const { identity } = useAuth();
   const search = window.location.search;
   const params = new URLSearchParams(search);
+
+  // Hooks
+  const { identity } = useAuth();
+  const { ckBtcLedger } = useCkBtcLedgerAnon();
+
+  // Local state
+  const [latestTransactionIndex, setLatestTransactionIndex] =
+    useState<bigint>();
+  const [receivedTransfer, setReceivedTransfer] = useState<Transfer>();
+  const [close, setClose] = useState<boolean>(false);
 
   const principal =
     params.get("principal") || identity?.getPrincipal().toString() || "";
 
-  const [latestTransaction, setLatestTransaction] = useState<
-    Transaction | undefined
-  >(undefined);
-  const [receivedTransaction, setReceivedTransaction] = useState<
-    Transaction | undefined
-  >(undefined);
-
-  const [close, setClose] = useState<boolean>(false);
-
-  React.useEffect(() => {
-    if (!principal) return;
-    const init = async () => {
-      const response = await fetchTransactions(principal, 1);
-      if (isResponseOk(response)) {
-        setLatestTransaction(response.data.data[0]);
+  function getLatestTransactionIndex() {
+    if (!principal || !ckBtcLedger) return;
+    (async () => {
+      const blocks = await ckBtcLedger?.get_blocks({
+        start: BigInt(0),
+        length: BigInt(1),
+      });
+      if (blocks?.chain_length) {
+        setLatestTransactionIndex(blocks.chain_length);
       }
-    };
-    init();
-  }, [principal]);
+    })();
+  }
+  useEffect(getLatestTransactionIndex, [principal, ckBtcLedger]);
 
-  React.useEffect(() => {
-    if (!principal || !latestTransaction) return;
+  useEffect(() => {
+    if (!principal || !latestTransactionIndex) return;
     const pollTransactions = setInterval(async () => {
-      const response = await fetchTransactions(principal, 1);
-      if (latestTransaction && isResponseOk(response)) {
-        const t = response.data.data[0];
+      const transaction = await ckBtcLedger?.get_transactions({
+        start: latestTransactionIndex,
+        length: BigInt(1),
+      });
+      if (
+        transaction?.transactions &&
+        Array.isArray(transaction.transactions) &&
+        transaction.transactions.length > 0
+      ) {
+        setLatestTransactionIndex(latestTransactionIndex + BigInt(1));
+        const t = transaction.transactions[0];
         if (
-          t.index !== latestTransaction.index &&
+          t &&
           t.kind === "transfer" &&
-          t.from_owner !== principal
+          t.transfer[0]?.to.owner.toString() === principal
         ) {
-          setReceivedTransaction(t);
-          setLatestTransaction(t);
+          setReceivedTransfer(t.transfer[0]);
         }
       }
     }, 15000); // 15 seconds
     return () => clearInterval(pollTransactions);
-  }, [principal, latestTransaction]);
+  }, [principal, latestTransactionIndex, ckBtcLedger]);
 
   let classNames =
     "absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full space-y-10 text-white bg-cyan-800 md:rounded-lg";
@@ -67,7 +76,7 @@ export default function TransactionOverlay() {
   const closeAnimation = () => {
     setClose(true);
     const interval = setTimeout(async () => {
-      setReceivedTransaction(undefined);
+      setReceivedTransfer(undefined);
       setClose(false);
     }, 150);
     return () => clearInterval(interval);
@@ -76,7 +85,7 @@ export default function TransactionOverlay() {
   const [playSound] = useSound("/cash-register.mp3");
 
   // Only show if there is a received transaction
-  if (!receivedTransaction) {
+  if (!receivedTransfer) {
     return null;
   }
 
@@ -93,8 +102,8 @@ export default function TransactionOverlay() {
       </div>
       <BadgeCheck className="w-36 h-36" />
       <div className="text-4xl font-bold">Payment Received!</div>
-      <PrincipalPill principal={receivedTransaction.from_owner} />
-      <div>{formatCkBtc(receivedTransaction.amount)} ckBTC</div>
+      <PrincipalPill principal={receivedTransfer?.from.owner} />
+      <div>{formatCkBtc(receivedTransfer?.amount)} ckBTC</div>
       <div className="grow" />
     </div>
   );
