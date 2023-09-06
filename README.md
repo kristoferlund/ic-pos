@@ -172,29 +172,46 @@ Why don't we deploy the frontend as a local canister? Vite uses lazy loading of 
 
 ### Step 10: Make a transfer!
 
-Now that everything is up and running, you can make a transfer to your newly created store. Log in to the frontend using the Internet Identity and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard. Then, using the `dfx` command, transfer some tokens to your store.
+Now that everything is up and running, you can make a transfer to your newly created store.
+
+Transfers made from the owner principal will not trigger notifications in the UI since they are regarded as `mint` transactions. To test notifications, you need to make a transfer from another principal.
+
+The easiest way to do this is to create two stores using two different Internet Identity accounts, using two different web browsers. Then, transfer some tokens from one store to the other.
+
+#### 10.1: Create the first store and supply it with some tokens
+
+Log in to the frontend using the Internet Identity. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard. Then, using the `dfx` command, mint some tokens from your owner principal to the store principal.
 
 ```bash
 dfx canister --network local call icrc1-ledger icrc1_transfer '
   (record {
     to=(record {
-      owner=(principal "[STORE PRINCIPAL HERE]")
+      owner=(principal "[STORE PRINCIPAL 1 HERE]")
     });
     amount=100_000
   })
 '
 ```
 
+#### 10.2: Create the second store
+
+Log in to the frontend using **a new Internet Identity on another web browser**. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard.
+
+Now, go back to the first browser/store, navigate to the `Send` page and transfer some tokens to the second store.
+
+If everything is working, you should see a notification in the second store.
+
+🎉
+
 ## Possible Improvements
 
-- Use `useCkBtcIndex` hook to fetch transactions instead of the ICRC API for logged in users.
 - Login state is not persisted. Reloading the app will log the user out. This should be done using `localStorage` or `sessionStorage`.
 - Show more information about transactions. A transaction detail page.
 - Show a confirmation dialog after user clicks on `Send` button.
 
 ## Known issues
 
-- Background notifications not working. Awaiting IC IPv4 support.
+-
 
 ## Contributing
 
