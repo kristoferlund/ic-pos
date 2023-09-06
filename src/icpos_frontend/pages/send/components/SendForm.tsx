@@ -16,6 +16,7 @@ import { convertToBigInt } from "../../../utils/convertToBigInt";
 import { toast } from "react-hot-toast";
 import useCkBtcLedger from "../../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "@tanstack/router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -32,6 +33,7 @@ type SendSchemaType = z.infer<typeof SendSchema>;
 
 export default function SendForm({ principal }: SendFormProps) {
   const { ledgerCanister, balance } = useCkBtcLedger();
+  const navigate = useNavigate();
 
   const form = useForm<SendSchemaType>({
     resolver: zodResolver(SendSchema),
@@ -72,7 +74,7 @@ export default function SendForm({ principal }: SendFormProps) {
         message: (error as Error).message,
       });
     }
-    if (amountBigInt > balance) {
+    if (balance && amountBigInt > balance) {
       return form.setError("amount", {
         message: "Amount exceeds balance.",
       });
@@ -89,6 +91,9 @@ export default function SendForm({ principal }: SendFormProps) {
 
       if (response) {
         toast.success("Transfer successful.");
+        setTimeout(() => {
+          navigate({ to: "/merchant" });
+        }, 500);
       } else {
         toast.error("An error occurred.");
       }

@@ -11,14 +11,6 @@ export default defineConfig({
     outDir: "../dist",
   },
   define: {
-    // network = local
-    // "process.env.CANISTER_ID_ICPOS_FRONTEND": JSON.stringify(
-    //   "bd3sg-teaaa-aaaaa-qaaba-cai"
-    // ),
-    // network = IC
-    "process.env.CANISTER_ID_ICPOS_FRONTEND": JSON.stringify(
-      "hngac-6aaaa-aaaal-qb6tq-cai"
-    ),
     global: "window",
   },
 });

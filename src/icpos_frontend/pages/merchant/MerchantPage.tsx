@@ -10,16 +10,25 @@ import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
 import ReceiveButton from "./components/ReceiveButton";
 import SendButton from "./components/SendButton";
+import TransactionOverlay from "../receive/components/TransactionOverlay";
+import { Transfer } from "../../canisters/icrc/types/transfer.type";
 import { formatCkBtc } from "../../utils/formatCkBtc";
 import { useAuth } from "../../auth/hooks/useAuth";
 import useCkBtcLedger from "../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
 import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
-import TransactionOverlay from "../receive/components/TransactionOverlay";
+import { useState } from "react";
 
 export default function MerchantPage() {
   const { merchantState } = useIcPos();
   const { identity, hasLoggedIn, logout } = useAuth();
-  const { balance } = useCkBtcLedger();
+  const { balance, getBalance } = useCkBtcLedger();
+
+  const [receivedTransfer, setReceivedTransfer] = useState<Transfer>();
+
+  const handleReceivedTransfer = (transfer: Transfer) => {
+    void getBalance();
+    setReceivedTransfer(transfer);
+  };
 
   // This page requires authentication
   if (!hasLoggedIn) {
@@ -51,12 +60,17 @@ export default function MerchantPage() {
             </Button>
           </Link>
         </HeaderSection>
-        <TransactionOverlay />
+        <TransactionOverlay onTransfer={handleReceivedTransfer} />
         <MainSection>
           <div className="flex flex-col items-center justify-between pb-10 space-y-5 grow">
             <div className="grow" />
             <div>{formatCkBtc(balance)} ckBTC</div>
             <PrincipalPill principal={identity?.getPrincipal().toString()} />
+            {receivedTransfer && (
+              <div className="text-sm text-gray-400">
+                Received {formatCkBtc(receivedTransfer.amount)} ckBTC
+              </div>
+            )}
             <div className="grow" />
             <ReceiveButton />
             <SendButton />

@@ -1,6 +1,6 @@
-export function formatCkBtc(amount: bigint | number | undefined) {
+export function formatCkBtc(amount: bigint | number | null | undefined) {
   if (amount === undefined) return "0";
-  amount = typeof amount === "bigint" ? amount : BigInt(amount);
+  amount = typeof amount === "number" ? BigInt(amount) : amount;
   if (!amount) return "0";
   const integerPart = amount / 100000000n;
   const fractionalPart = amount % 100000000n;

@@ -1,17 +1,39 @@
-import { IcrcLedgerCanister } from "@dfinity/ledger";
+import { IcrcLedgerCanister, IcrcTokenMetadataResponse } from "@dfinity/ledger";
+import { useCallback, useEffect, useState } from "react";
+
 import { Principal } from "@dfinity/principal";
-import React from "react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 
 export default function useCkBtcLedger() {
   const { identity, agent } = useAuth();
-  const [ledgerCanister, setLedgerCanister] = React.useState<
+  const [ledgerCanister, setLedgerCanister] = useState<
     IcrcLedgerCanister | undefined
   >();
-  const [balance, setBalance] = React.useState<bigint>(0n);
 
-  React.useEffect(() => {
-    if (!identity || !agent) return;
+  const [metadata, setMetadata] = useState<IcrcTokenMetadataResponse>();
+  const [balance, setBalance] = useState<bigint | null>();
+
+  const getMetadata = useCallback(async () => {
+    if (!ledgerCanister) {
+      throw new Error("LedgerCanister not initialized");
+    }
+    setMetadata(await ledgerCanister.metadata({ certified: false }));
+  }, [ledgerCanister]);
+
+  const getBalance = useCallback(async () => {
+    if (!ledgerCanister || !identity) {
+      return null;
+    }
+    setBalance(
+      await ledgerCanister.balance({
+        owner: identity.getPrincipal(),
+        certified: false,
+      })
+    );
+  }, [ledgerCanister, identity]);
+
+  useEffect(() => {
+    if (!identity || !agent || metadata || balance) return;
     const init = async () => {
       const ledgerCanister = IcrcLedgerCanister.create({
         agent,
@@ -20,22 +42,11 @@ export default function useCkBtcLedger() {
         ),
       });
       setLedgerCanister(ledgerCanister);
-
-      const balance = await ledgerCanister.balance({
-        owner: identity.getPrincipal(),
-        certified: false,
-      });
-      setBalance(balance);
+      await getMetadata();
+      await getBalance();
     };
     init();
-  }, [identity, agent]);
+  }, [identity, agent, getBalance, getMetadata, metadata, balance]);
 
-  const metadata = async () => {
-    if (!ledgerCanister) {
-      throw new Error("LedgerCanister not initialized");
-    }
-    return ledgerCanister.metadata({ certified: false });
-  };
-
-  return { ledgerCanister, metadata, balance };
+  return { ledgerCanister, getMetadata, getBalance, metadata, balance };
 }

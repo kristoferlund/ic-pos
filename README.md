@@ -2,7 +2,9 @@
 
 # IC-POS
 
-The Internet Computer [integrates directly with the Bitcoin network](https://internetcomputer.org/docs/current/developer-docs/integrations/bitcoin/). This allows canisters on the Internet Computer to receive, hold, and send Bitcoin, all directly with transactions on the Bitcoin network. Chain-key Bitcoin (ckBTC) is an ICRC-1-compliant token that is backed 1:1 by Bitcoin held 100% on the IC mainnet. IC-POS is an experimental app to demonstrate a real world use case for ckBTC on the Internet Computer. It is a simple Point of Sale app that allows users to accept ckBTC payments.
+IC-POS is an experimental app to demonstrate a real world use case for ckBTC on the Internet Computer. It is a simple Point of Sale app that allows users to accept ckBTC payments.
+
+The Internet Computer [integrates directly with the Bitcoin network](https://internetcomputer.org/docs/current/developer-docs/integrations/bitcoin/). This allows canisters on the Internet Computer to receive, hold, and send Bitcoin, all directly with transactions on the Bitcoin network. Chain-key Bitcoin (ckBTC) is an ICRC-1-compliant token that is backed 1:1 by Bitcoin held 100% on the IC mainnet.
 
 For deeper understanding of the ICP < > BTC integration, see the IC wiki article on [Bitcoin integration](https://wiki.internetcomputer.org/wiki/Bitcoin_Integration).
 
@@ -15,7 +17,7 @@ For deeper understanding of the ICP < > BTC integration, see the IC wiki article
 
 ## Try it!
 
-EzPOS is deployed on the Internet Computer. You can try it out here:
+IC-POS is deployed on the Internet Computer. You can try it out here:
 
 https://hngac-6aaaa-aaaal-qb6tq-cai.icp0.io/
 
@@ -44,61 +46,172 @@ The frontend interacts with the following IC canisters:
 - `ckbtc ledger` - to send ckBTC to other users.
 - `internet identity` - to authenticate users.
 
+# Local deployment
+
 ## Prerequisites
 
 - [x] Install the [IC SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install/index.mdx).
 
 ### Step 1: Start a local instance of the Internet Computer
 
-```
+```bash
 dfx start --background
 ```
 
-### Step 2: Deploy the icpos canister:
+### Step 2: Deploy the Internet Identity canister
 
+Integration with the [Internet Identity](https://internetcomputer.org/internet-identity/) allows store owners to securely setup and manage their store. The Internet Identity canister is already deployed on the IC mainnet. For local development, you need to deploy it to your local instance of the IC.
+
+```bash
+dfx deploy --network local internet_identity
 ```
-dfx deploy icpos --argument '(0)'
+
+### Step 3: Save current principal as a variable
+
+The principal will be used when deploying the ledger canister.
+
+```bash
+export OWNER=$(dfx identity get-principal)
 ```
+
+### Step 3: Deploy the ckBTC ledger canister
+
+The responsibilities of the ledger canister is to keep track of token balances and handle token transfers.
+
+The ckBTC ledger canister is already deployed on the IC mainnet. ckBTC implements the [ICRC-1](https://internetcomputer.org/docs/current/developer-docs/integrations/icrc-1/) token standard. For local development, we deploy the ledger for an ICRC-1 token mimicking the mainnet setup.
+
+Take a moment to read the details of the call we are making below. Not only are we deploying the ledger canister, we are also:
+
+- Naming the token `Local ckBTC / LCKBTC`
+- Setting the owner principal to the principal we saved in the previous step.
+- Minting 100_000_000_000 tokens to the owner principal.
+- Setting the transfer fee to 10 LCKBTC.
+
+```bash
+dfx deploy --network local icrc1-ledger --argument '
+  (variant {
+    Init = record {
+      token_name = "Local ckBTC";
+      token_symbol = "LCKBTC";
+      minting_account = record { owner = principal "'${OWNER}'";};
+      initial_balances = vec { record { record { owner = principal "'${OWNER}'";}; 100_000_000_000; }; };
+      metadata = vec {};
+      transfer_fee = 10;
+      archive_options = record {
+        trigger_threshold = 2000;
+        num_blocks_to_archive = 1000;
+        controller_id = principal "'${OWNER}'";
+      }
+    }
+  })
+'
+```
+
+### Step 4: Save the ledger principal as a variable
+
+We need this information in the next step, when deploying the index canister.
+
+```bash
+export LEDGER_PRINCIPAL=$(dfx canister --network local id icrc1-ledger)
+```
+
+### Step 5: Deploy the index canister
+
+The index canister syncs the ledger transactions and indexes them by account.
+
+```bash
+dfx deploy --network local icrc1-index --argument '
+  record {
+   ledger_id = (principal "'${LEDGER_PRINCIPAL}'");
+  }
+'
+```
+
+### Step 6: Deploy the icpos canister
+
+The icpos canister manages the store configuration and sends notifications when a payment is received.
 
 The `--argument '(0)'` argument is used to initialize the canister with `startBlock` set to 0. This is used to tell the canister to start monitoring the ledger from block 0. When deploying to the IC mainnet, this should be set to the current block height to prevent the canister from processing old transactions.
 
-### Step 3: Set Courier credentials
-
-IC-POS uses [Courier](https://courier.com/) to send email and SMS notifications. You need to configure your Courier credentials in the `icpos` canister. You can do this by running the following command:
-
+```bash
+dfx deploy --network local icpos --argument '(0)'
 ```
+
+### Step 7: Configure the icpos canister
+
+The icpos canister needs to be configured with the ledger id to be able to monitor for new transactions and send notifications.
+
+```bash
+dfx canister --network local call icpos setLedgerId "${LEDGER_PRINCIPAL}"
+```
+
+ic-pos uses [Courier](https://courier.com/) to send email and SMS notifications. If you want to enable notifications, you need to sign up for a Courier account and and create and API key. Then issue the following command:
+
+```bash
 dfx canister --network local call icpos setCourierApiKey "pk_prod_..."
 ```
 
-### Step 4: Build and run the frontend
+### Step 8 - Setup `.env` for the frontend environment
 
+The frontend needs information about how to access the canisters. This is done by setting environment variables. Copy the `.env.template` file and rename it to `.env`. Then update the values to match your local setup.
+
+```bash
+cp src/.env.template src/.env
 ```
+
+### Step 9: Build and run the frontend
+
+Run yarn to install dependencies and start the frontend. The frontend will be available at http://localhost:5173.
+
+```bash
 yarn
 yarn dev
 ```
 
-The frontend is best run locally using yarn. Accessing the frontend through the local canister does not work at the moment due to lazy loading of modules. When deploying to ic mainnet this is not an issue.
+Why don't we deploy the frontend as a local canister? Vite uses lazy loading of modules. This does not work when deploying to a local canister. When deploying to the IC mainnet, this is not an issue. Also, running using `yarn dev` allows for hot reloading of the frontend code when making changes.
 
-## Not yet implemented
+### Step 10: Make a transfer!
 
-- **Email notifications and SMS notifications are not yet fully functional.** Notifications work well in a local setting but not when deployed to the IC mainnet. This is due to the inability to call IPv4 addresses from the IC mainnet. As of writing, Courier does not support IPv6, nor have I found any other service that does.
+Now that everything is up and running, you can make a transfer to your newly created store.
 
-## Notes
+Transfers made from the owner principal will not trigger notifications in the UI since they are regarded as `mint` transactions. To test notifications, you need to make a transfer from another principal.
 
-- Make sure you update the frontend environment variables in `src/.env` to match your local setup. Also update `vite.config.ts` to set the frontend canister id.
-- The ICRC ledger address is hardcoded in `src/icpos/main.mo`. Make sure you update this before deploying.
-- I included the generated files in `src/declarations` to highlight the changes I made to the generated code. Vite does not support `process.env` so I had to manually replace it with `import.meta.env`.
+The easiest way to do this is to create two stores using two different Internet Identity accounts, using two different web browsers. Then, transfer some tokens from one store to the other.
+
+#### 10.1: Create the first store and supply it with some tokens
+
+Log in to the frontend using the Internet Identity. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard. Then, using the `dfx` command, mint some tokens from your owner principal to the store principal.
+
+```bash
+dfx canister --network local call icrc1-ledger icrc1_transfer '
+  (record {
+    to=(record {
+      owner=(principal "[STORE PRINCIPAL 1 HERE]")
+    });
+    amount=100_000
+  })
+'
+```
+
+#### 10.2: Create the second store
+
+Log in to the frontend using **a new Internet Identity on another web browser**. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard.
+
+Now, go back to the first browser/store, navigate to the `Send` page and transfer some tokens to the second store.
+
+If everything is working, you should see a notification in the second store.
+
+🎉
 
 ## Possible Improvements
 
-- Use `useCkBtcLedger` hook to fetch transactions instead of the ICRC API for logged in users.
 - Login state is not persisted. Reloading the app will log the user out. This should be done using `localStorage` or `sessionStorage`.
 - Show more information about transactions. A transaction detail page.
 - Show a confirmation dialog after user clicks on `Send` button.
 
 ## Known issues
 
-- Background notifications not working. Awaiting IC IPv4 support.
+-
 
 ## Contributing
 

@@ -53,7 +53,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           identity,
           host: import.meta.env.VITE_IC_HOST,
         });
-        await agent.fetchRootKey();
+        if (import.meta.env.MODE === "development") {
+          await agent.fetchRootKey();
+        }
         setAgent(agent);
 
         setIsAuthenticated(true);
