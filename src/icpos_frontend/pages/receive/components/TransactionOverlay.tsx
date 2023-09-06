@@ -10,7 +10,13 @@ import { useEffect } from "react";
 import useSound from "use-sound";
 import { useState } from "react";
 
-export default function TransactionOverlay() {
+type TransactionOverlayProps = {
+  onTransfer?: (transfer: Transfer) => void;
+};
+
+export default function TransactionOverlay({
+  onTransfer,
+}: TransactionOverlayProps) {
   const search = window.location.search;
   const params = new URLSearchParams(search);
 
@@ -61,11 +67,12 @@ export default function TransactionOverlay() {
           t.transfer[0]?.to.owner.toString() === principal
         ) {
           setReceivedTransfer(t.transfer[0]);
+          onTransfer && onTransfer(t.transfer[0]);
         }
       }
     }, 15000); // 15 seconds
     return () => clearInterval(pollTransactions);
-  }, [principal, latestTransactionIndex, ckBtcLedger]);
+  }, [principal, latestTransactionIndex, ckBtcLedger, onTransfer]);
 
   let classNames =
     "absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full space-y-10 text-white bg-cyan-800 md:rounded-lg";

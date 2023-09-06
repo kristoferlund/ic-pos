@@ -28,7 +28,7 @@ export default function HistoryPage() {
     if (!principal || !ckBtcIndex) return;
     (async () => {
       const response = await ckBtcIndex.getTransactions({
-        max_results: BigInt(10),
+        max_results: BigInt(6),
         account: {
           owner: Principal.fromText(principal),
         },
