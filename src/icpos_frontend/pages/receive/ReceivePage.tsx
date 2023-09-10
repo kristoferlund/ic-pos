@@ -26,6 +26,12 @@ export default function ReceivePage() {
   const principal =
     params.get("principal") || identity?.getPrincipal().toString() || "";
 
+  const amount = params.get("amount");
+
+  const qrCodeValue = amount
+    ? `ckbtc:${principal}?amount=${amount}`
+    : principal;
+
   return (
     <Page>
       <div className="relative flex flex-col grow">
@@ -48,8 +54,10 @@ export default function ReceivePage() {
         <TransactionOverlay />
         <MainSection>
           <div className="flex flex-col items-center justify-between flex-1 pt-10 pb-10 space-y-5 grow">
-            <div className="text-4xl font-bold">Pay with ckBTC</div>
-            <QRCodeSVG value={principal} height={300} width={300} />
+            <div className="text-4xl font-bold">
+              {amount ? `Pay ckBTC: ${amount}` : "Pay with ckBTC"}
+            </div>
+            <QRCodeSVG value={qrCodeValue} height={300} width={300} />
             <div className="flex flex-col items-center justify-center space-y-3">
               {!params.has("principal") && (
                 <div>{merchantState.merchant?.name}</div>
