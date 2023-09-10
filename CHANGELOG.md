@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0] - 2022-09-10
+
+### Added
+
+- Now you can charge a set amount, similar to Sumup and the likes. Enter the amount to charge and click the "Charge" button. The generated QR code will contain information about the token and amount to charge. The customer can then scan and pay with any wallet that supports the QR format, NNS for instance. Raad more about ICRC-22 payment requests: https://github.com/dfinity/ICRC/issues/22
+
+### Fixed
+
+- Improved printing styles, QR code now fills more of the page.
+
 ## [0.2.0] - 2022-09-06
 
 ### Added
