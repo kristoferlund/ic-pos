@@ -80,3 +80,13 @@
 a button {
   @apply text-white;
 }
+
+@media print {
+  .print-bg {
+    @apply bg-white from-white to-white;
+  }
+
+  .print-maincontainer {
+    @apply !min-h-full zoom-in-150 !shadow-none;
+  }
+}
