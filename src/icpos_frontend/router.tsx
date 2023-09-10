@@ -34,6 +34,12 @@ const configRoute = new Route({
   component: lazy(() => import("./pages/config/ConfigPage")),
 });
 
+const chargeRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/charge",
+  component: lazy(() => import("./pages/charge/ChargePage")),
+});
+
 const receiveRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/receive",
@@ -70,6 +76,7 @@ const routes = [
   merchantRoute,
   initialConfigRoute,
   configRoute,
+  chargeRoute,
   receiveRoute,
   receiveSelectPrincipalRoute,
   sendRoute,

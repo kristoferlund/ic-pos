@@ -3,9 +3,9 @@ import { Link } from "@tanstack/router";
 
 export default function ReceiveButton() {
   return (
-    <Link to="/receive">
+    <Link to="/charge">
       <Button size={"lg"} className="w-56">
-        Receive
+        Charge
       </Button>
     </Link>
   );

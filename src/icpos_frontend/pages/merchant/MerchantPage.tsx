@@ -1,4 +1,4 @@
-import { Cog, LogOut } from "lucide-react";
+import { Cog, LogOut, QrCodeIcon } from "lucide-react";
 import { Link, Navigate } from "@tanstack/router";
 
 import { Button } from "../../components/ui/button";
@@ -8,7 +8,6 @@ import HistoryButton from "../../components/HistoryButton";
 import MainSection from "../../components/MainSection";
 import Page from "../../components/Page";
 import PrincipalPill from "../../components/PrincipalPill";
-import ReceiveButton from "./components/ReceiveButton";
 import SendButton from "./components/SendButton";
 import TransactionOverlay from "../receive/components/TransactionOverlay";
 import { Transfer } from "../../canisters/icrc/types/transfer.type";
@@ -17,6 +16,7 @@ import { useAuth } from "../../auth/hooks/useAuth";
 import useCkBtcLedger from "../../canisters/ckbtc-ledger/hooks/useCkBtcLedger";
 import { useIcPos } from "../../canisters/ic-pos/hooks/useIcPos";
 import { useState } from "react";
+import ChargeButton from "./components/ChargeButton";
 
 export default function MerchantPage() {
   const { merchantState } = useIcPos();
@@ -72,8 +72,11 @@ export default function MerchantPage() {
               </div>
             )}
             <div className="grow" />
-            <ReceiveButton />
+            <ChargeButton />
             <SendButton />
+            <Link to="/receive" className="flex items-center gap-2">
+              Show store QR code <QrCodeIcon />
+            </Link>
             <div className="flex flex-col items-center justify-end grow">
               <HistoryButton principal={identity?.getPrincipal().toString()} />
             </div>
