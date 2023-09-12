@@ -10,10 +10,11 @@ For deeper understanding of the ICP < > BTC integration, see the IC wiki article
 
 ## Features
 
-- Users can login with their Internet Identity and configure a store.
-- Display a QR code for customers to scan and pay. When a payment is received, the app will display a confirmation message.
-- Payment notificactions as email/sms even when the app is not open. This uses the [HTTP Outcall](https://internetcomputer.org/docs/current/developer-docs/integrations/https-outcalls/) feature of the Internet Computer.
-- Send ckBTC to other users.
+- **Create store**: Users logs in with their Internet Identity and configure the store with a name and other settings.
+- **Charge customer**: Users can charge a customer by entering an amount. This will generate and display a QR code for the customer to scan and pay. QR code follows the ICR-22 standard.
+- **Send tokens**: Users can send ckBTC tokens to other users.
+- **Receive notifications**: Users can choose to receive notifications by email or SMS when a payment is received. This uses the [HTTP Outcall](https://internetcomputer.org/docs/current/developer-docs/integrations/https-outcalls/) feature of the Internet Computer.
+- **Transaction history**: Users can view a list of transactions made to the store.
 
 ## Try it!
 
@@ -31,8 +32,9 @@ The backend is written in Motoko and consist of one canister, `icpos`. It expose
 
 - `getMerchant` - returns the store configuration for a given principal.
 - `updateMerchant` - updates the store configuration for a given principal.
-- `getLogs` - The canister maintains a debug log that can be fetched using this method.
 - `setCourierApiKey` - sets the Courier API key used to send email and SMS notifications. Only the canister controller can call this method.
+- `setLedgerId` - sets the ledger id to monitor for transactions. Only the canister controller can call this method.
+- `getLogs` - The canister maintains a debug log that can be fetched using this method.
 
 In addition to the public methods, the canister uses a [timer](https://internetcomputer.org/docs/current/motoko/main/timers/) to monitor ledger transactions. When a new transaction is found that matches a configured store – depending on the store settings – the canister will send a notification either by email or SMS.
 
@@ -44,6 +46,7 @@ The frontend interacts with the following IC canisters:
 
 - `icpos` - to fetch and update store configuration.
 - `ckbtc ledger` - to send ckBTC to other users.
+- `ckbtc index` - to fetch transaction history.
 - `internet identity` - to authenticate users.
 
 # Local deployment
