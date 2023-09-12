@@ -230,6 +230,8 @@ shared (actorContext) actor class Main(_startBlock : Nat) {
 
     // Setup request
     let httpRequest : HttpTypes.HttpRequestArgs = {
+      // The notification service is hosted on Netlify and the URL is hardcoded
+      // in this example. In a real application, the URL would be configurable.
       url = "https://icpos-notifications.xyz/.netlify/functions/notify";
       max_response_bytes = ?Nat64.fromNat(1000);
       headers = [
