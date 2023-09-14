@@ -146,12 +146,6 @@ dfx deploy --network local icpos --argument '(0)'
 
 ### Step 6: Configure the icpos canister
 
-The icpos canister needs to be configured with the ledger id to be able to monitor for new transactions and send notifications.
-
-```bash
-dfx canister --network local call icpos setLedgerId "mxzaz-hqaaa-aaaar-qaada-cai"
-```
-
 ic-pos uses [Courier](https://courier.com/) to send email and SMS notifications. If you want to enable notifications, you need to sign up for a Courier account and and create and API key. Then issue the following command:
 
 ```bash

@@ -2,7 +2,8 @@
   "canisters": {
     "icpos": {
       "main": "src/icpos/main.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "dependencies": ["icrc1_ledger"]
     },
     "icpos_frontend": {
       "dependencies": ["icpos"],
