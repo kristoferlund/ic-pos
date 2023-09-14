@@ -60,7 +60,7 @@ The frontend interacts with the following IC canisters:
 ### Step 1: Start a local instance of the Internet Computer
 
 ```bash
-dfx start --background
+dfx start --clean --background
 ```
 
 ### Step 2: Deploy the Internet Identity canister
@@ -87,13 +87,14 @@ The ckBTC ledger canister is already deployed on the IC mainnet. ckBTC implement
 
 Take a moment to read the details of the call we are making below. Not only are we deploying the ledger canister, we are also:
 
+- Deploying the canister to the same canister ID as the mainnet ledger canister. This is to make it easier to switch between local and mainnet deployments.
 - Naming the token `Local ckBTC / LCKBTC`
 - Setting the owner principal to the principal we saved in the previous step.
 - Minting 100_000_000_000 tokens to the owner principal.
 - Setting the transfer fee to 10 LCKBTC.
 
 ```bash
-dfx deploy --network local --specified-id mxzaz-hqaaa-aaaar-qaada-cai icrc1-ledger --argument '
+dfx deploy --network local --specified-id mxzaz-hqaaa-aaaar-qaada-cai icrc1_ledger --argument '
   (variant {
     Init = record {
       token_name = "Local ckBTC";
@@ -126,7 +127,7 @@ dfx deploy --network local --specified-id mxzaz-hqaaa-aaaar-qaada-cai icrc1-ledg
 The index canister syncs the ledger transactions and indexes them by account.
 
 ```bash
-dfx deploy --network local icrc1-index --argument '
+dfx deploy --network local icrc1_index --argument '
   record {
    ledger_id = (principal "mxzaz-hqaaa-aaaar-qaada-cai");
   }
@@ -181,7 +182,7 @@ The easiest way to do this is to create two stores using two different Internet 
 Log in to the frontend using the Internet Identity. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard. Then, using the `dfx` command, mint some tokens from your owner principal to the store principal.
 
 ```bash
-dfx canister --network local call icrc1-ledger icrc1_transfer '
+dfx canister --network local call icrc1_ledger icrc1_transfer '
   (record {
     to=(record {
       owner=(principal "[STORE PRINCIPAL 1 HERE]")

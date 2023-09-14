@@ -30,7 +30,7 @@ try {
 const canisterDefinitions = Object.entries(canisterIds).reduce(
     (acc, [key, val]) => ({
         ...acc,
-        [`process.env.${key.toUpperCase()}_CANISTER_ID`]: isDev
+        [`process.env.CANISTER_ID_${key.toUpperCase()}`]: isDev
             ? JSON.stringify(val.local)
             : JSON.stringify(val.ic),
     }),
@@ -69,6 +69,7 @@ export default defineConfig({
         "process.env.NODE_ENV": JSON.stringify(
             isDev ? "development" : "production"
         ),
+        "process.env.DFX_NETWORK": JSON.stringify(isDev ? "local" : "ic"),
         global: "globalThis",
     },
 });

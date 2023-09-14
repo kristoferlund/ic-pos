@@ -31,7 +31,7 @@
     "dfx:start": "dfx start --background",
     "dfx:deploy:local": "dfx deploy --network=local --argument '(0)'",
     "dfx:deploy:ic": "dfx deploy --network=ic --argument '(64051)'",
-    "dfx:generate": "dfx generate icpos"
+    "dfx:generate": "dfx generate"
   },
   "dependencies": {
     "@dfinity/agent": "^0.19.2",
