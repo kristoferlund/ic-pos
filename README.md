@@ -2,7 +2,7 @@
 
 # IC-POS
 
-IC-POS is an experimental app to demonstrate a real world use case for ckBTC on the Internet Computer. It is a simple Point of Sale app that allows users to accept ckBTC payments.
+IC-POS is an experimental app to demonstrate a real world use case for [ckBTC](https://internetcomputer.org/ckbtc/) on the Internet Computer. It is a simple Point of Sale app that allows users to accept ckBTC payments.
 
 The Internet Computer [integrates directly with the Bitcoin network](https://internetcomputer.org/docs/current/developer-docs/integrations/bitcoin/). This allows canisters on the Internet Computer to receive, hold, and send Bitcoin, all directly with transactions on the Bitcoin network. Chain-key Bitcoin (ckBTC) is an ICRC-1-compliant token that is backed 1:1 by Bitcoin held 100% on the IC mainnet.
 
@@ -11,7 +11,7 @@ For deeper understanding of the ICP < > BTC integration, see the IC wiki article
 ## Features
 
 - **Create store**: Users logs in with their Internet Identity and configure the store with a name and other settings.
-- **Charge customer**: Users can charge a customer by entering an amount. This will generate and display a QR code for the customer to scan and pay. QR code follows the ICR-22 standard.
+- **Charge customer**: Users can charge a customer by entering an amount. This will generate and display a QR code for the customer to scan and pay. QR code follows the [ICRC-22](https://github.com/dfinity/ICRC/issues/22) standard.
 - **Send tokens**: Users can send ckBTC tokens to other users.
 - **Receive notifications**: Users can choose to receive notifications by email or SMS when a payment is received. This uses the [HTTP Outcall](https://internetcomputer.org/docs/current/developer-docs/integrations/https-outcalls/) feature of the Internet Computer.
 - **Transaction history**: Users can view a list of transactions made to the store.
@@ -96,8 +96,17 @@ dfx deploy --network local icrc1-ledger --argument '
     Init = record {
       token_name = "Local ckBTC";
       token_symbol = "LCKBTC";
-      minting_account = record { owner = principal "'${OWNER}'";};
-      initial_balances = vec { record { record { owner = principal "'${OWNER}'";}; 100_000_000_000; }; };
+      minting_account = record { 
+        owner = principal "'${OWNER}'";
+      };
+      initial_balances = vec { 
+        record { 
+          record { 
+            owner = principal "'${OWNER}'";
+          }; 
+          100_000_000_000; 
+        }; 
+      };
       metadata = vec {};
       transfer_fee = 10;
       archive_options = record {
