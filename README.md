@@ -54,6 +54,8 @@ The frontend interacts with the following IC canisters:
 ## Prerequisites
 
 - [x] Install the [IC SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install/index.mdx).
+- [x] Install [Node.js](https://nodejs.org/en/).
+- [x] Install [Yarn](https://yarnpkg.com/).
 
 ### Step 1: Start a local instance of the Internet Computer
 
