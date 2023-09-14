@@ -157,15 +157,7 @@ ic-pos uses [Courier](https://courier.com/) to send email and SMS notifications.
 dfx canister --network local call icpos setCourierApiKey "pk_prod_..."
 ```
 
-### Step 8 - Setup `.env` for the frontend environment
-
-The frontend needs information about how to access the canisters. This is done by setting environment variables. Copy the `.env.template` file and rename it to `.env`. Then update the values to match your local setup.
-
-```bash
-cp src/.env.template src/.env
-```
-
-### Step 9: Build and run the frontend
+### Step 7: Build and run the frontend
 
 Run yarn to install dependencies and start the frontend. The frontend will be available at http://localhost:5173.
 
@@ -176,7 +168,7 @@ yarn dev
 
 Why don't we deploy the frontend as a local canister? Vite uses lazy loading of modules. This does not work when deploying to a local canister. When deploying to the IC mainnet, this is not an issue. Also, running using `yarn dev` allows for hot reloading of the frontend code when making changes.
 
-### Step 10: Make a transfer!
+### Step 8: Make a transfer!
 
 Now that everything is up and running, you can make a transfer to your newly created store.
 
@@ -184,7 +176,7 @@ Transfers made from the owner principal will not trigger notifications in the UI
 
 The easiest way to do this is to create two stores using two different Internet Identity accounts, using two different web browsers. Then, transfer some tokens from one store to the other.
 
-#### 10.1: Create the first store and supply it with some tokens
+#### 8.1: Create the first store and supply it with some tokens
 
 Log in to the frontend using the Internet Identity. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard. Then, using the `dfx` command, mint some tokens from your owner principal to the store principal.
 
@@ -199,7 +191,7 @@ dfx canister --network local call icrc1-ledger icrc1_transfer '
 '
 ```
 
-#### 10.2: Create the second store
+#### 8.2: Create the second store
 
 Log in to the frontend using **a new Internet Identity on another web browser**. Configure the store and navigate to the `Receive` page. Click on the principal pill to copy the address to your clipboard.
 
