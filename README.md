@@ -93,7 +93,7 @@ Take a moment to read the details of the call we are making below. Not only are 
 - Setting the transfer fee to 10 LCKBTC.
 
 ```bash
-dfx deploy --network local icrc1-ledger --argument '
+dfx deploy --network local --specified-id mxzaz-hqaaa-aaaar-qaada-cai icrc1-ledger --argument '
   (variant {
     Init = record {
       token_name = "Local ckBTC";
@@ -121,27 +121,19 @@ dfx deploy --network local icrc1-ledger --argument '
 '
 ```
 
-### Step 4: Save the ledger principal as a variable
-
-We need this information in the next step, when deploying the index canister.
-
-```bash
-export LEDGER_PRINCIPAL=$(dfx canister --network local id icrc1-ledger)
-```
-
-### Step 5: Deploy the index canister
+### Step 4: Deploy the index canister
 
 The index canister syncs the ledger transactions and indexes them by account.
 
 ```bash
 dfx deploy --network local icrc1-index --argument '
   record {
-   ledger_id = (principal "'${LEDGER_PRINCIPAL}'");
+   ledger_id = (principal "mxzaz-hqaaa-aaaar-qaada-cai");
   }
 '
 ```
 
-### Step 6: Deploy the icpos canister
+### Step 5: Deploy the icpos canister
 
 The icpos canister manages the store configuration and sends notifications when a payment is received.
 
@@ -151,12 +143,12 @@ The `--argument '(0)'` argument is used to initialize the canister with `startBl
 dfx deploy --network local icpos --argument '(0)'
 ```
 
-### Step 7: Configure the icpos canister
+### Step 6: Configure the icpos canister
 
 The icpos canister needs to be configured with the ledger id to be able to monitor for new transactions and send notifications.
 
 ```bash
-dfx canister --network local call icpos setLedgerId "${LEDGER_PRINCIPAL}"
+dfx canister --network local call icpos setLedgerId "mxzaz-hqaaa-aaaar-qaada-cai"
 ```
 
 ic-pos uses [Courier](https://courier.com/) to send email and SMS notifications. If you want to enable notifications, you need to sign up for a Courier account and and create and API key. Then issue the following command:
