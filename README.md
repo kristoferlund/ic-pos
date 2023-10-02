@@ -55,7 +55,6 @@ The frontend interacts with the following IC canisters:
 
 - [x] Install the [IC SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install/index.mdx).
 - [x] Install [Node.js](https://nodejs.org/en/).
-- [x] Install [Yarn](https://yarnpkg.com/).
 
 ### Step 1: Start a local instance of the Internet Computer
 
@@ -99,16 +98,16 @@ dfx deploy --network local --specified-id mxzaz-hqaaa-aaaar-qaada-cai icrc1_ledg
     Init = record {
       token_name = "Local ckBTC";
       token_symbol = "LCKBTC";
-      minting_account = record { 
+      minting_account = record {
         owner = principal "'${OWNER}'";
       };
-      initial_balances = vec { 
-        record { 
-          record { 
+      initial_balances = vec {
+        record {
+          record {
             owner = principal "'${OWNER}'";
-          }; 
-          100_000_000_000; 
-        }; 
+          };
+          100_000_000_000;
+        };
       };
       metadata = vec {};
       transfer_fee = 10;
@@ -154,14 +153,14 @@ dfx canister --network local call icpos setCourierApiKey "pk_prod_..."
 
 ### Step 7: Build and run the frontend
 
-Run yarn to install dependencies and start the frontend. The frontend will be available at http://localhost:5173.
+Run npm to install dependencies and start the frontend. The frontend will be available at http://localhost:5173.
 
 ```bash
-yarn
-yarn dev
+npm install
+npm run dev
 ```
 
-Why don't we deploy the frontend as a local canister? Vite uses lazy loading of modules. This does not work when deploying to a local canister. When deploying to the IC mainnet, this is not an issue. Also, running using `yarn dev` allows for hot reloading of the frontend code when making changes.
+Why don't we deploy the frontend as a local canister? Vite uses lazy loading of modules. This does not work when deploying to a local canister. When deploying to the IC mainnet, this is not an issue. Also, running using `npm run dev` allows for hot reloading of the frontend code when making changes.
 
 ### Step 8: Make a transfer!
 
