@@ -12,7 +12,7 @@
       },
       "source": ["dist"],
       "type": "assets",
-      "build": ["yarn run build"]
+      "build": ["npm run build"]
     },
     "internet_identity": {
       "type": "custom",
